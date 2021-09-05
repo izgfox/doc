@@ -1,8 +1,8 @@
-# wifi interface stop & clean
+# Wifi interface stop & clean
 ```
 ifconfig wlan0 0.0.0.0 down
 ```
-# wifi interface up
+# Wifi interface up
 ### Interface name may be wlan[0-1]
 ```
 ifconfig wlan0 up
