@@ -1,0 +1,205 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Root file system on software RAID-0 THE EASY WAY</title>
+  </head>
+
+<BODY TEXT="#000000" BGCOLOR="#FFFFFF">
+    <h1>Root file system on software RAID-0 THE EASY WAY</h1>
+
+<p>Author: David Flater, <a href="mailto:dave@flaterco.com">dave@flaterco.com</a><br>
+URL: <a href="https://flaterco.com/kb/RAID-0-root.html">https://flaterco.com/kb/RAID-0-root.html</a><br>
+<!-- Created: Thu Jun 14 20:57:17 EDT 2007 -->
+<!-- hhmts start -->
+Last modified: Sun Jun  2 10:52:56 EDT 2019
+<!-- hhmts end -->
+</p>
+
+<h2>Introduction</h2>
+
+<p>There are plenty of how-to guides that explain how to get a striped RAID-0
+file system mounted as your root file system in Linux using an
+initramfs.&nbsp; This web page explains a simpler and easier way that
+requires no initramfs.</p>
+
+<h2>How-To</h2>
+
+<p>If you boot a kernel with RAID and the other necessary drivers built in
+(NOT as modules), it will automatically assemble partitions of type fd
+("Linux raid autodetect") into a RAID array that you can use as your root fs
+without the need for an initramfs.&nbsp; As of kernel version 3.7.9, the
+necessary options for RAID are under Device Drivers &rarr; Multiple devices
+driver support (RAID and LVM) &rarr; RAID support (CONFIG_BLK_DEV_MD):</p>
+
+<table><tr>
+<td>
+<img src="menuconfig_RAID.png">
+</td><td>
+<ul>
+<li>Autodetect RAID arrays during kernel boot (CONFIG_MD_AUTODETECT)</li>
+<li>Linear (append) mode (CONFIG_MD_LINEAR)</li>
+<li>RAID-0 (striping) mode (CONFIG_MD_RAID0)</li>
+<li>[... other RAID modes ...]</li>
+</ul>
+&nbsp;&nbsp;These are not the same as the RAID option under "Device mapper support."
+</li>
+</ul>
+</td></tr></table>
+
+<p>Of course, you will also need to build in other essential drivers like
+those for your hard drive and motherboard chipset.&nbsp; If that is too
+difficult to figure out, try Slackware's huge.s prebuilt kernel.</p>
+
+<p>You will also need a small, non-RAID partition that is just big enough to
+hold the stuff that normally goes in /boot (the kernel, System.map, config,
+and a few LILO files), because the kernel itself cannot be loaded from the
+RAID array.</p>
+
+<p>Following is what I did to get this working using a Slackware 14.0-based
+installation CD.</p>
+
+<p><ol>
+
+<li>Replaced the Slackware kernel package with my own build of mainline
+kernel 3.7.9 in which most things are built in.&nbsp; Only certain things
+(like ALSA) really need to be modules.</li>
+
+<li>At the root prompt after booting from the CD, partitioned the two hard
+disks using fdisk.
+
+  <ul>
+
+  <li>Due to a <a
+  href="http://serverfault.com/questions/265056/mdadm-assembles-with-drives-instead-of-partitions">special
+  feature</a> of the superblock format that RAID autodetect requires, it is
+  necessary to exclude the last 64&nbsp;kB (128&nbsp;sectors) of a device
+  from the RAID partition.&nbsp; In this example, the size of sdb1 had to be
+  reduced by 128 sectors from the default size that filled the disk.</li>
+
+  <li>/dev/sda was larger than /dev/sdb, but I partitioned them so that the
+  RAID-0 partitions would be exactly the same size.&nbsp; This required
+  specifying the size of sda1 using the last sector number rather than an
+  offset of so many KB.</li>
+
+  </ul>
+
+<pre>
+Disk /dev/sda: 6488 MB, 6488294400 bytes
+255 heads, 63 sectors/track, 788 cylinders, total 12672450 sectors
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sda1            2048     8421711     4209832   fd  Linux raid autodetect
+/dev/sda2         8423424     8525823       51200   83  Linux
+/dev/sda3         8525824     8787967      131072   82  Linux swap
+/dev/sda4   *     8787968    12672449     1942241    c  W95 FAT32 (LBA)
+</pre>
+
+<pre>
+Disk /dev/sdb: 4311 MB, 4311982080 bytes
+58 heads, 61 sectors/track, 2380 cylinders, total 8421840 sectors
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sdb1            2048     8421711     4209832   fd  Linux raid autodetect
+</pre>
+</li>
+
+<li>Still at the root prompt, created the RAID array, telling mdadm to
+use the old 0.90 superblock format:
+<pre>
+mdadm -C /dev/md0 -l 0 -e 0.90 -n 2 /dev/sda1 /dev/sdb1
+</pre>
+
+<p>If the partitions are different sizes, one can choose linear RAID
+(a.k.a. JBOD = Just a Bunch of Disks) instead of RAID-0 at this point by
+saying &ndash;l linear instead of &ndash;l 0.&nbsp; (TO DO:&nbsp; Test
+whether the separate boot partition is still necessary for linear RAID.)</p>
+
+<p>If mdadm prints errors about disks already in use, you can get rid of
+an existing autodetected array with mdadm &ndash;S /dev/md0 and then
+proceed as above.</p>
+
+<p>After creating the array but before going through the entire Slackware
+setup, it's wise to reboot and see how (and if) the newly created array is
+autodetected.&nbsp; Just because it works from the command line when you've
+explicitly specified the devices doesn't mean that it will be autodetected
+properly by the kernel.</p>
+
+</li>
+
+<li>Started Slackware setup.</li>
+
+<li>Specified /dev/md0 as the root file system and formatted it.</li>
+
+<li>Formatted /dev/sda2 and mounted it on /boot.</li>
+
+<li>Ran through the remaining Slackware install process as usual, allowing it
+to drop the kernel into /boot and choosing /dev/md0 as the root during LILO
+installation.&nbsp; (One does not need to say anything about /dev/sda2 in
+lilo.conf.)</li>
+
+<li>Exit setup and reboot.&nbsp; It boots.&nbsp; Done!</li>
+
+</ol></p>
+
+<h2>Notes</h2>
+
+<p><ol>
+<li>The RAID used here was Linux's own software RAID, which always works.&nbsp;
+It did not involve the BIOS of a modern "fakeraid" motherboard or anything
+else.</li>
+
+<li>RAID-1 (mirrored not striped) does not necessitate a separate boot
+partition.&nbsp; LILO can boot the kernel directly from any device in the
+array.&nbsp; RAID-0 is a challenge because a kernel stored within the RAID
+array would get split across the multiple devices, and LILO needs it in one
+piece to boot it.</li>
+
+<li>/dev/mdN is used for a non-partitionable array.&nbsp; A partitionable
+array would use /dev/md_dN or /dev/md/dN instead.&nbsp; See the DEVICE NAMES
+section at the bottom of the mdadm man page.</li>
+
+<li>The kernel RAID autodetect feature has been called "deprecated" for a
+long time, but if it suffices for the task, it's still the easiest way.</li>
+</ol></p>
+
+<h2>Log messages</h2>
+
+<pre>
+Linux version 3.7.9-hylafax (root@yellowbeard) (gcc version 4.7.2 (GCC) ) #1 Sun Feb 24 09:25:33 EST 2013
+
+md: linear personality registered for level -1
+md: raid0 personality registered for level 0
+
+md: Waiting for all devices to be available before autodetect
+md: If you don't use raid, use raid=noautodetect
+md: Autodetecting RAID arrays.
+md: Scanned 2 and added 2 devices.
+md: autorun ...
+md: considering sdb1 ...
+md:  adding sdb1 ...
+md:  adding sda1 ...
+md: created md0
+md: bind<sda1>
+md: bind<sdb1>
+md: running: <sdb1><sda1>
+md/raid0:md0: md_size is 16838656 sectors.
+md: RAID0 configuration for md0 - 1 zone
+md: zone0=[sda1/sdb1]
+      zone-offset=         0KB, device-offset=         0KB, size=   8419328KB
+
+md0: detected capacity change from 0 to 8621391872
+md: ... autorun DONE.
+ md0: unknown partition table
+EXT4-fs (md0): mounted filesystem with ordered data mode. Opts: (null)
+VFS: Mounted root (ext4 filesystem) readonly on device 9:0.
+</pre>
+
+<hr>
+<P>
+<A HREF="index.html">KB</A><br>
+<A HREF="../index.html">Home</A>
+</P>
+  </body>
+</html>
