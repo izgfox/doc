@@ -21,3 +21,7 @@ dhclient wlan0
 ```
 # Setup complete
 
+# Grab commands from .md file
+```
+cat ./wifiClientSetup.md | grep -v "#" | grep -v '```'
+```
