@@ -1,0 +1,114 @@
+Mirror Slackware-Current
+
+Eric Hameleers wrote this script to help you create your own local Slackware mirror back in 2009 and it still works great today: http://www.slackware.com/~alien/tools/mirror-slackware-current.sh
+
+Let’s try it out.
+
+Download mirror-slackware-current.sh :
+
+wget http://www.slackware.com/~alien/tools/mirror-slackware-current.sh
+chmod +x mirror-slackware-current.sh
+
+The script expects that the following directory exists:
+
+mkdir -pv slackware64-current
+
+Then:
+
+ARCH=x86_64 \
+./mirror-slackware-current.sh \
+-l . \
+-X none \
+-o NONE
+
+ARCH=x86_64 tells the script to mirror the 64-bit version of Slackware-Current.
+
+-l . tells the script to create the mirror right here in our current directory where we created the directories slackware64-current and slackware64-current-iso .
+
+-X none tells the script to not filter any parts of the mirror — essentially, to mirror everything.
+
+-o NONE tells the script to skip create an installer DVD ISO file when it finishes creating a local mirror. (This is a a brilliant featurein mirror-slackware-current.sh , but we don’t need it for this. If we had created an ISO file, mirror-slackware-current.sh expects that a directory named slackware64-current-iso exists in addition to the one we created.)
+
+Fun fact: mirror-slackware-current.sh can mirror stable Slackware releases with the -r flag, as well. For example, adding -r 14.2 ought to give us a mirror of Slackware 14.2.
+Burn Slackware-Current to a USB Stick
+
+Let’s burn the Slackware installer to our USB device at /dev/sda .
+
+First, we need to know which file represents our USB device.
+
+I use this technique to make sure I know which device my Linux operating system thinks my USB drive is:
+
+sudo su
+watch 'dmesg | tail'
+# insert USB device
+
+In my case, it’s clear to see that my Linux operating system recognizes my USB device as /dev/sda when I plug it in. In your case, it may be something else. If it is, you’ll have to adjust the remaining commands accordingly.
+
+Optionally, at this point, I sometimes choose to wipe my USB drive, before I burn the Slackware to it:
+
+dc3dd wipe=/dev/sda verb=on
+
+I use dc3dd instead of just dd because dc3dd offers the verb=on flag, which gives me an idea about the progress its making as it runs. I find the wipe= flag handy as well.
+
+On to the main event.
+
+Again, Eric Hameleers wrote a great script called usbimg2disk.sh, which has shipped with the Slackware installer for years. As a result of mirroring Slackware-Current, we should have a copy of it in slackware-current/usb-and-pxe-installers/. Let’s see it in action:
+
+./slackware64-current/usb-and-pxe-installers/usbimg2disk.sh \
+-u \
+-f \
+-s ./slackware64-current \
+-i slackware64-current/usb-and-pxe-installers/usbboot.img \
+-o /dev/sda
+
+-u tells the script to run “unattended” (i.e. don’t ask me any questions, assume defaults are fine, etc)
+
+-f will format the drive specified by the -o flag.
+
+-s tells the script where the root of our collection of Slackware packages is.
+
+-i tells the script where the usbboot.img binary lives.
+
+-o tells the script which device to prepare as a Slackware installer. In my case, it’s /dev/sda.
+
+When I run the script in this way, I see the following output:
+
+--- Formatting /dev/sda with VFAT partition label 'USBSLACKINS'...
+--- Available free space on the the USB drive is 15102536 KB
+--- Required free space for installer: 54516 KB
+--- Copying boot files to the USB drive...
+--- Copying Slackware package tree to the USB drive...
+--- Syncing I/O...
+--- Unmounting volumes and deleting temporary files...
+--- Making the USB drive '/dev/sda' bootable...
+--- Done.
+
+That’s it! We’re done!
+
+You should now be able to reboot a machine with this USB stick plugged in, and install Slackware-Current the way you’d normally install Slackware.
+Bonus Tips
+
+While usbimg2disk.sh is running, the following line takes quite a while to complete, in my experience:
+
+--- Copying Slackware package tree to the USB drive...
+
+When I first started using this script, it sat idle long enough at this point that I thought something may have gone wrong. In this case, however, no news is good news.
+
+Still, I prefer a bit more information about the progress being made. When usbimg2disk.sh gets to this point, all it is doing is copying the Slackware packages we just cached locally with mirror-slackware-current.sh to our USB drive at /dev/sda . So, to keep an eye on the script’s progress, I pop open another terminal window to…
+
+    Determine the ballpark number of Slackware packages that we ought to copy to /dev/sda :
+
+find slackware64-current/slackware64/ | wc -l
+
+2. Keep an eye on the number of Slackware packages actually transferred to /dev/sda :
+
+MY_MNT=$(mount | grep sda | awk '{print $3}')
+watch "find $MY_MNT/slackware64-current/ | wc -l"
+
+Note that the number that I see from 2 is a few hundred more than what I see in 1. That’s a good enough ball park for me. I just want to know that the script is progressing and have a relative idea about how close it is to done.
+
+Also, the following line takes a while to complete, for me:
+
+--- Syncing I/O...
+
+If usbimg2disk.sh reaches this point, though, I know that everything went well. I don’t try to measure progress, in this case. I just walk away from the computer for a few minutes. Usually by the time I come back it’s done
