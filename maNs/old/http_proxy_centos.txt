@@ -1,0 +1,13 @@
+/usr/sbin/setsebool httpd_can_network_connect 1
+
+<VirtualHost *:80>
+ServerName adapters
+ServerAlias adapters
+   ProxyRequests Off
+   <Proxy *>
+   #Order deny,allow
+   #Allow from all
+   </Proxy>
+   ProxyPass / http://10.250.1.161:8080/
+   ProxyPassReverse / http://10.250.1.161:8080/
+</VirtualHost>

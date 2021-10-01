@@ -1,0 +1,10 @@
+#rpm -Uvh http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el5.rf.x86_64.rpm
+#yum install nagios-nrpe
+groupadd nagios
+useradd -g nagios nagios
+
+ ln -s libssl.so.1.0.1e libssl.so.6
+ ln -s libcrypto.so.1.0.1e libcrypto.so.6
+
+#service nrpe start
+#chkconfig nrpe on

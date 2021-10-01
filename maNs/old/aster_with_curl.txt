@@ -1,0 +1,18 @@
+yum -y install mysql mysql-server mysql-devel
+
+yum install -y make wget openssl-devel ncurses-devel  newt-devel libxml2-devel kernel-devel gcc gcc-c++ sqlite-devel libuuid-devel libcurl-devel svn
+
+svn checkout http://svn.asterisk.org/svn/asterisk/branches/11 asterisk-11
+
+
+./configure --libdir=/usr/lib64 --prefix=/usr --disable-asteriskssl
+
+	
+
+compiler flags dont optimize (for xen) + убрать галку build native
+
+make make install
+
+
+
+yum install -y make wget openssl-devel ncurses-devel  newt-devel libxml2-devel kernel-devel gcc gcc-c++ sqlite-devel libuuid-devel libcurl-devel svn

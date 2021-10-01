@@ -1,0 +1,40 @@
+1) Ставим centos 6.5 minimal x86_64
+2) disable selinux
+3) iptables off
+4) конфигурим сеть
+5) yum update
+6) yum install wget
+7) yum install patch
+8) yum install zlib-devel
+9) yum install telnet
+
+mkdir /ssl
+cd /ssl
+wget http://archive.apache.org/dist/httpd/httpd-2.2.23.tar.gz
+tar xzvf httpd-2.2.23.tar.gz
+wget http://cryptocom.ru/opensource/apache-2.2.23-openssl-1.0.1c.diff
+cp apache-2.2.23-openssl-1.0.1c.diff ./httpd-2.2.23/
+cd httpd-2.2.23
+patch -p1 < apache-2.2.23-openssl-1.0.1c.diff
+cd ..
+cp /tmp/cryptopack.tar.gz /opt/
+tar xzvf cryptopack.tar.gz
+cd /ssl/httpd-2.2.23/
+./configure --enable-mods-shared="all ssl"  --enable-proxy --with-ssl=/opt/cryptopack2 --prefix=/opt/apache-2.2.23
+make
+make install
+cp /tmp/conf.tar.gz /opt/apache-2.2.23/
+rm -rf /opt/apache-2.2.23/conf/
+cd /opt/apache-2.2.23/
+tar xzvf conf.tar.gz
+echo "export LD_LIBRARY_PATH=/opt/cryptopack2/lib" >> /opt/apache-2.2.23/bin/apachectl
+
+вставить
+<html><head><meta http-equiv='refresh' content='0;URL=/cpgu/'></head><body></body></html>
+в index html рута апача
+
+
+На клиента ставим CPFOX
+
+
+

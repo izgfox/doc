@@ -1,0 +1,7 @@
+###############################################################################
+## Services
+###############################################################################
+  check process mais with pidfile /tmp/mais/mais.pid.
+    #start program = "/root/maisstart.sh" as uid mais and gid mais
+    start program = "/home/lportal/liferay/tomcat-7.0.23/bin/startup.sh" as uid mais and gid mais
+    stop program  = "/root/maisstop.sh" as uid mais and gid mais

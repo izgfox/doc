@@ -1,0 +1,286 @@
+ls /usr/java/jdk1.6.0_45/
+   65  cd /usr/java/jdk1.6.0_45/jre/lib/security/
+   66  /etc/init.d/tomcat6 stop
+   67  date
+   68  ls -l
+   69  cat /etc/is
+   70  cat /etc/issue
+   71  yum search tomczt6
+   72  yum search tomcat6
+   73  yum install tomcat6.x86_64
+   74  rpm -ivh jdk-7u71-linux-x64.rpm
+   75  which java
+   76  ls -lh /usr/bin/java
+   77  cd /etc/alternatives/
+   78  ls -l java
+   79  rm java
+   80  ln -s /usr/java/jdk1.7.0_71/bin/java
+   81  java -version
+   82  ls
+   83  cd ~
+   84  ls
+   85  tar -xvfz cryptopro.tar.gz
+   86  tar xvfz cryptopro.tar.gz
+   87  cd CryptoPro/lib/
+   88  rpm -ivh /root/jdk-6u45-linux-x64.tar.gz
+   89  mv /root/jdk-6u45-linux-x64.tar.gz /usr/java/
+   90  cd /usr/java/
+   91  ls
+   92  tar xfv jdk-6u45-linux-x64.tar.gz
+   93  ls -l
+   94  chmod 744 jdk-6u45-linux-x64.bin
+   95  ./jdk-6u45-linux-x64.bin
+   96  ls -l
+   97  rm latest/
+   98  rm -r default/
+   99  rm -rf default/
+  100  ls -l
+  101  rm -rf default/
+  102  rm -rf latest/
+  103  ls -l
+  104  cd /root/CryptoPro/
+  105  cd lib/
+  106  ./install.sh /usr/java/jdk1.6.0_45/jre/ CF10Z-31000-00B22-W6EPV-PLAFV "NVision Group"
+  107  cp ../ext/* /usr/java/jdk1.6.0_45/jre/lib/ext/
+  108  vim /etc/sysconfig/tomcat6
+  109  yum -y install vim
+  110  vim /etc/sysconfig/tomcat6
+  111  /etc/init.d/tomcat6 start
+  112  ps aux \ grep java
+  113  ps aux | grep java
+  114  cd /usr/java/jdk1.6.0_45/jre/lib/ext/
+  115  rm -fv commons-logging-1.1.jar serializer-2.7.1.jar wss4j-1.5.11.jar xalan-2.7.1.jar xml-apis-1.3.03.jar xmlsec-1.4.5.jar
+  116  ifconfig
+  117  ~
+  118  cd ~
+  119  ls
+  120  java -version
+  121  cd /etc/alternatives/
+  122  ps aux | grep java
+  123  ifconfig
+  124  vim /etc/tomcat6/context.xml
+  125  yum search postgresql
+  126  yum -y install postgresql.i686
+  127  yum search postgresql
+  128  yum -y install postgresql.i68
+  129  cat /etc/tomcat6/context.xml
+  130  psql -h 192.168.10.50 -W -U adapter adapterdb
+  131  mkdir /etc/tomcat6/adapters/
+  132  vim /etc/tomcat6/adapters/adapter.properties
+  133  vim /etc/tomcat6/adapters/hibernate.cfg.xml
+  134  vim  /etc/tomcat6/adapters/jbpm-processes.properties
+  135  vim /etc/tomcat6/adapters/log4j.properties
+  136  cd /usr/java/jdk1.6.0_45/jre/lib/ext/
+  137  wget http://jdbc.postgresql.org/download/postgresql-8.4-703.jdbc3.jar
+  138  yum -y install wget
+  139  wget http://jdbc.postgresql.org/download/postgresql-8.4-703.jdbc3.jar
+  140  /etc/init.d/tomcat6 stop
+  141  ls *war
+  142  cd /root/
+  143  ls * war
+  144  ls *war
+  145  cp -v *war /var/lib/tomcat6/webapps/
+  146  cd /var/lib/tomcat6/webapps/
+  147  ls -l
+  148  /etc/init.d/tomcat6 start && tail -f /var/log/tomcat6/catalina.out
+  149  ls -l /opt/tomcat/logs/adapter-reverse-calls.log
+  150  vim /etc/tomcat6/adapters/log4j.properties
+  151  /etc/init.d/tomcat6 restart && tail -f /var/log/tomcat6/catalina.out
+  152  reset
+  153  /etc/init.d/tomcat6 restart && tail -f /var/log/tomcat6/catalina.out
+  154  vim /etc/tomcat6/context.xml
+  155  cat /etc/tomcat6/context.xml
+  156  psql -h 192.168.10.50 -W -U adapter adapterdb
+  157  cd /usr/java/jdk1.6.0_45/jre/lib/ext/
+  158  ls -l
+  159  rm -fv commons-logging-1.1.jar serializer-2.7.1.jar wss4j-1.5.11.jar xalan-2.7.1.jar xml-apis-1.3.03.jar xmlsec-1.4.5.jar
+  160  ls
+  161  ls -l
+  162  rm -fv commons-logging-1.1.jar serializer-2.7.1.jar wss4j-1.5.11.jar xalan-2.7.1.jar xml-apis-1.3.03.jar xmlsec-1.4.5.jar
+  163  cp /root/CryptoPro/ext/* .
+  164  ls -l /etc/tomcat6/
+  165  ls -l /etc/tomcat6/adapters/
+  166  vim /etc/tomcat6/adapters/hibernate.cfg.xml
+  167  /etc/init.d/tomcat6 restart && tail -f /var/log/tomcat6/catalina.out
+  168  ps aux | grep java
+  169  cd /etc/alternatives/
+  170  ls -l java
+  171  rm java
+  172  ln -s /usr/java/jdk1.6.0_45/bin/java
+  173  ls -l
+  174  ls -l java
+  175  java -version
+  176  /etc/init.d/tomcat6 restart && tail -f /var/log/tomcat6/catalina.out
+  177  cd -
+  178  ls
+  179  ls -l post*
+  180  history | grep psql
+  181  cat /etc/tomcat6/context.xml
+  182  psql -h 192.168.10.50 -W -U adapter adapterdb
+  183  zcat /root/adaptersdb.schema.sql.gz |  psql -h 192.168.10.50 -W -U adapter adapterdb
+  184  history | grep restart
+  185  /etc/init.d/tomcat6 restart && tail -f /var/log/tomcat6/catalina.out
+  186  ls -l /etc/tomcat6/
+  187  vim /etc/tomcat6/context.xml
+  188  mc
+  189  cd ~
+  190  yum -y install unzip file mc
+  191  mc
+  192  /etc/init.d/tomcat6 restart && tail -f /var/log/tomcat6/catalina.out
+  193  ps uax | grep java
+  194  vim /etc/sysconfig/iptables
+  195  /etc/init.d/tomcat6 restart && tail -f /var/log/tomcat6/catalina.out
+  196  /etc/init.d/iptables restart
+  197  /etc/init.d/tomcat6 restart && tail -f /var/log/tomcat6/catalina.out
+  198  iptables -S
+  199  cat /etc/tomcat6/context.xml
+  200  psql -h 192.168.10.50 -W -U adapter adapterdb
+  201  ls
+  202  zcat adaptersdb.schema.sql.gz | psql -h 192.168.10.50 -W -U adapter adapterdb
+  203  /etc/init.d/tomcat6 restart && tail -f /var/log/tomcat6/catalina.out
+  204  vim /etc/tomcat6/context.xml
+  205  cd /etc/tomcat6/adapters/
+  206  ls -lh
+  207  vim /etc/tomcat6/context.xml
+  208  /etc/init.d/tomcat6 restart && tail -f /var/log/tomcat6/catalina.out
+  209  vim /etc/tomcat6/context.xml
+  210  /etc/init.d/tomcat6 restart && tail -f /var/log/tomcat6/catalina.out
+  211  cd /usr/java/jdk1.6.0_45/jre/lib/ext/
+  212  ls
+  213  rm postgresql-8.4-703.jdbc3.jar
+  214  wget http://jdbc.postgresql.org/download/postgresql-9.1-903.jdbc3.jar
+  215  cd /usr/share/java/tomcat6/
+  216  wget http://jdbc.postgresql.org/download/postgresql-9.1-903.jdbc3.jar
+  217  /etc/init.d/tomcat6 restart && tail -f /var/log/tomcat6/catalina.out
+  218  cd /var/lib/tomcat6/
+  219  ls -l
+  220  cd /usr/share/tomcat6/
+  221  ls -l
+  222  ls -l lib/
+  223  cd lib/
+  224  rm postgresql-9.1-903.jdbc3.jar
+  225  wget http://jdbc.postgresql.org/download/postgresql-8.4-703.jdbc3.jar
+  226  /etc/init.d/tomcat6 restart && tail -f /var/log/tomcat6/catalina.out
+  227  ls -l
+  228  wget http://jdbc.postgresql.org/download/postgresql-9.0-802.jdbc3.jar
+  229  /etc/init.d/tomcat6 restart && tail -f /var/log/tomcat6/catalina.out
+  230  cd ../webapps
+  231  mc
+  232  /etc/init.d/tomcat6 restart && tail -f /var/log/tomcat6/catalina.out
+  233  ls -l /etc/tomcat6/adapters/
+  234  cd /etc/tomcat6/adapters/
+  235  vim adapter.properties
+  236  vim hibernate.cfg.xml
+  237  vim jbpm-processes.properties
+  238  vim log4j.properties
+  239  /etc/init.d/tomcat6 restart && tail -f /var/log/tomcat6/catalina.out
+  240  find / -name "posgresql*jar"
+  241  find / -name "postgresql*jar"
+  242  rm /usr/share/java/tomcat6/postgresql-8.4-703.jdbc3.jar
+  243  rm /usr/java/jdk1.6.0_45/jre/lib/ext/postgresql-9.1-903.jdbc3.jar
+  244  /etc/init.d/tomcat6 restart && tail -f /var/log/tomcat6/catalina.out
+  245  find / -name "postgresql*jar"
+  246  cd /usr/share/java/tomcat6/
+  247  rm postgresql-9.0-802.jdbc3.jar
+  248  wget http://jdbc.postgresql.org/download/postgresql-8.4-703.jdbc3.jar
+  249  /etc/init.d/tomcat6 restart && tail -f /var/log/tomcat6/catalina.out
+  250  rpm -qa | grep tomcat
+  251  rpm -qa | grep java
+  252  ls -l /usr/java/
+  253  pwd
+  254  ls -l
+  255  cd /var/lib/tomcat6/webapps/
+  256  ls -l
+  257  ls adapter-web
+  258  ls adapter-web/
+  259  ls -l adapter-web/
+  260  vim adapter-web/WEB-INF/classes/conf/hibernate.cfg.xml
+  261  cd /etc/tomcat6/
+  262  cd adapters/
+  263  cd ..
+  264  ls -l
+  265  /etc/init.d/tomcat6 restart && tail -f /var/log/tomcat6/catalina.out
+  266  vim /usr/share/tomcat6/conf/adapters/hibernate.cfg.xml
+  267  ls -l /usr/share/tomcat6/conf/adapters/hibernate.cfg.xml
+  268  vim /usr/share/tomcat6/conf/adapters/hibernate.cfg.xml
+  269  /etc/init.d/tomcat6 restart && tail -f /var/log/tomcat6/catalina.out
+  270  vim adapters/hibernate.cfg.xml
+  271  grep -r AdapterDS /var/lib/tomcat6/webapps/adapter-web/
+  272  vim /var/lib/tomcat6/webapps/adapter-web/WEB-INF/web.xml
+  273  grep -r AdapterDS /etc/tomcat6/
+  274  vim /etc/tomcat6/context.xml
+  275  history | grep find
+  276  find / -name "postgresql*jar"
+  277  vim /etc/sysconfig/tomcat6
+  278  /etc/init.d/tomcat6 restart && tail -f /var/log/tomcat6/catalina.out
+  279  vim /etc/sysconfig/tomcat6
+  280  ifconfig
+  281  iptables -L -nv
+  282  exit
+  283  top
+  284  route
+  285  exit
+  286  sudo service tomcat6 stop
+  287  cd /usr/share/tomcat6/conf/
+  288  mc
+  289  cd /usr/share/tomcat6/
+  290  mc
+  291  chown tomcat: adapter-web.war -R
+  292  mc
+  293  cd /usr/share/tomcat6/
+  294  mc
+  295  cd /
+  296  mc
+  297  sudo service tomcat6 start
+  298  cd /var/tomcat6/log/
+  299  cd /var/tomcat6/logs/
+  300  cd /var/log/tomcat6/
+  301  mc
+  302  exit
+  303  sudo service tomcat6 restart
+  304  sudo service tomcat6 stop
+  305  cd /root/
+  306  mc
+  307  cd /usr/lib/jvm/jdk1.6.0_45/jre/lib/ext/
+  308  cd /usr/lib/jvm/
+  309  mc
+  310  find / -name commons-logging
+  311  find / -name commons-logging-1.1.jar
+  312  cd /usr/java/jdk1.6.0_45/jre/lib/ext
+  313  mc
+  314  find / -name xml-apis-1.3.03.jar
+  315  find / -name
+  316  find / -name xmlsec-1.4.5.jar
+  317  cd /var/log/tomcat6/
+  318  mc
+  319  sudo service tomcat6 start
+  320  sudo service tomcat6 stop
+  321  clear
+  322  cd /var/
+  323  mc
+  324  chown tomcat: tomcat/ -R
+  325  sudo service tomcat6 start
+  326  sudo service tomcat6 stop
+  327  mc
+  328  java CheckCP Irkutsk20142015 1
+  329  mc
+  330  find / -name JCP.jar
+  331  cd /usr/java/jdk1.6.0_45/jre/lib/ext/
+  332  mc
+  333  java CheckCP Irkutsk20142015 1
+  334  mc
+  335  clear
+  336  sudo service tomcat6 start
+  337  exit
+  338  cat /etc/hosts
+  339  ping 218.93.250.18
+  340  ping 172.21.129.6
+  341  vim /etc/hosts
+  342  ping pk4nlbsmev.k4.egov.local
+  343  cd /usr/share/tomcat6/conf/adapters/
+  344  mc
+  345  cd /usr/share/tomcat6/conf/adapters/
+  346  mc
+  347  sudo service tomcat6 restart
+  348  exit
+  349  su -l postgres

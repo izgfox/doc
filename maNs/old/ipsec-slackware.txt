@@ -1,0 +1,4 @@
+CFLAGS="-O2 -march=i486 -mcpu=i686" 
+
+
+./configure --enable-stats --enable-hybrid --enable-shared --enable-frag --enable-adminport --enable-rc5 --enable-idea --enable-dpd --prefix=/usr --enable-security-context=no --with-kernel-headers=/usr/include --with-flexlib=-lfl --enable-natt

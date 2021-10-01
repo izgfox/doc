@@ -1,0 +1,9 @@
+1) touch /etc/rsyslog.d/$daemon.conf
+
+echo "
+:programname, isequal, "$daemon" -/var/log/$daemon.log
+& ~
+
+" > /etc/rsyslog.d/$daemon.conf
+
+/etc/init.d/rsyslog restart

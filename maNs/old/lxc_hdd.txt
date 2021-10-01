@@ -1,0 +1,5 @@
+dd if=/dev/zero of=/raid/mysql.fs bs=100M count=100
+
+mkfs.ext3 /raid/mysql.fs
+
+mount -t ext3 -o loop /raid/mysql.fs /var/lib/mysql/

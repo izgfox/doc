@@ -1,0 +1,1 @@
+/tmp/backup/ 10.1.1.51/32(rw,sync,no_subtree_check,anonuid=0,anongid=0)

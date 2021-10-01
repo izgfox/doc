@@ -1,0 +1,50 @@
+dd if=/dev/zero of=/crypto/pass.key bs=1 count=256
+
+cryptsetup luksFormat /dev/sdb
+
+cryptsetup isLuks /dev/sdb && echo Sucess
+   Sucñess
+
+cryptsetup luksDump /dev/sdb
+
+cryptsetup luksUUID /dev/sdb
+
+e1828c8d-da90-45a4-bfe4-47484eeaf9fe
+
+cryptsetup --key-file /crypto/pass.key luksOpen /dev/sdb ais
+
+ dmsetup info ais
+
+Name:              ais
+State:             ACTIVE
+Read Ahead:        256
+Tables present:    LIVE
+Open count:        0
+Event number:      0
+Major, minor:      254, 0
+Number of targets: 1
+UUID: CRYPT-LUKS1-e1828c8dda9045a4bfe447484eeaf9fe-ais
+
+
+
+mke2fs -j /dev/mapper/ais
+
+mkdir /opt/atcfs_storage
+
+ mount /dev/mapper/ais /opt/atcfs_storage
+
+mcedit /etc/crypttab
+luks-e1828c8d-da90-45a4-bfe4-47484eeaf9fe UUID=e1828c8d-da90-45a4-bfe4-47484eeaf9fe /crypto/pass.key
+
+mcedit /etc/fstab
+
+/dev/mapper/luks-e1828c8d-da90-45a4-bfe4-47484eeaf9fe /opt/atcfs_storage ext3  defaults 0 0
+
+
+mcedit /etc/rc.local
+
+cryptsetup --key-file /crypto/pass.key luksOpen /dev/sdb ais
+mount /dev/mapper/ais /opt/atcfs_storage
+
+update-rc.d rc.local defaults
+reboot

@@ -1,0 +1,55 @@
+yum -y groupinstall core
+yum -y groupinstall base
+yum -y install epel-release
+yum install gcc gcc-c++ lynx bison mysql-devel mysql-server libsrtp libsrtp-devel php php-mysql php-pear php-mbstring tftp-server httpd make ncurses- devel libtermcap-devel sendmail sendmail-cf caching-nameserver sox newt-devel libxml2-devel libtiff-devel audiofile-devel gtk2-devel subversion kernel- devel git subversion kernel-devel php-process crontabs cronie cronie-anacron sqlite-devel
+yum install -y libncurses-devel libz-devel libssl-devel libxml2-devel libsqlite3-devel uuid-devel uuid libcurl-devel libspeex-devel libspeexdsp-devel libogg-devel libvorbis-devel libasound2-devel portaudio19-devel libcurl4-openssl-devel libpq-devel unixodbc-devel libsqlite0-devel libmysqlclient15-devel libneon27-devel libgmime-devel libusb-devel liblua5.1-0-devel lua5.1 libopenh323-devel libvpb-devel libgtk2.0-devel libmysqlclient-devel libbluetooth-devel libradiusclient-ng-devel freetds-devel libsnmp-devel libiksemel-devel libcorosync-devel libnewt-devel libpopt-devel libical-devel libspandsp-devel libjack-devel libresample-devel libc-client-devel binutils-devel libsrtp-devel libgsm1-devel libedit-devel doxygen libjansson-devel libldap-devel subversion git libxslt1-devel mc htop iftop
+ mkdir /install
+cd /install
+wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-13-current.tar.gz
+
+tar xzvf asterisk-13-current.tar.gz
+
+
+
+
+yum -y install epel-release
+yum install ftp gcc gcc-c++ lynx bison mysql-devel mysql-server libsrtp libsrtp-devel php php-mysql php-pear php-mbstring tftp-server httpd make ncurses- devel libtermcap-devel sendmail sendmail-cf caching-nameserver sox newt-devel libxml2-devel libtiff-devel audiofile-devel gtk2-devel subversion kernel- devel git subversion kernel-devel php-process crontabs cronie cronie-anacron sqlite-devel
+
+
+cd /install/asterisk13/contrib/scripts/
+./install_prereq install
+
+./install_prereq install-unpackaged
+
+cd /install/asterisk3/
+./configure && make menuselect
+в меню надо проверить есть ли звездочки
+
+Channel Drivers -> chan_pjsip и chan_sip
+Resource Modules -> res_srtp, res_crypto и res_http_websocket
+
+make && make install
+
+ ln -s /usr/lib/libasteriskssl.so.1 /usr/lib64/libasteriskssl.so.1
+
+
+mkdir /etc/asterisk/keys
+cd /install/asterisk-12.8.2/contrib/scripts/
+./ast_tls_cert -C 192.168.154.195 -O "ATCons" -d /etc/asterisk/keys
+
+/etc/init.d/mysqld start
+
+mysql_secure_installation
+
+cd /home
+
+ftp 109.202.0.226
+
+get ast_jssip.tar.gz
+tar xzvf ast_jssip.tar.gz
+mysql -u root -pbriv31so2 < /home/deploy/astall.sql
+cp /home/deploy/etc/asterisk/* /etc/asterisk/
+ mysql -u root -pbriv31so2
+grant all privileges on asterisk.* to 'asterisk'@'%' identified by 'briv31so2';
+cd /var/www/html/
+svn checkout http://sipml5.googlecode.com/svn/trunk/ sipml5

@@ -1,0 +1,8 @@
+SELECT  operator, count(*)
+FROM (
+  SELECT operator FROM calls where AnswerDate between "2015-12-14 00:00:00" and "2015-12-14 23:59:59" and  operator != ''
+  UNION ALL
+  SELECT cid as operator FROM calls_out where DialDate between "2015-12-14 00:00:00" and "2015-12-14 23:59:59" and  cid != ''
+) s
+
+GROUP BY operator

@@ -1,0 +1,44 @@
+############ opensips ##################################
+yum -y install gcc bison flex zlib-devel openssl-devel mysql-server mysql-devel wget libxslt lynx ncurses-devel gdb gcc-c++ patch readline readline-devel zlib zlib-devel libyaml-devel libffi-devel openssl-devel make bzip2 autoconf automake libtool bison iconv-devel
+yum install libev-devel
+mkdir /install
+cd /install
+wget http://opensips.org/pub/opensips/2.1.1/opensips-2.1.1.tar.gz
+tar xzvf opensips-2.1.1.tar.gz
+cd opensips-2.1.1
+make
+make install
+
+
+############ oversip ###################################
+
+
+
+curl -L get.rvm.io | bash -s stable
+
+(gpg2 --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3)
+
+
+curl -L get.rvm.io | bash -s stable
+
+source /etc/profile.d/rvm.sh
+
+rvm install 2.0
+
+ln -s /usr/include/libev/ev.h /usr/include/ev.h
+
+
+
+
+{
+ gem update
+ gem install rubdev
+}
+
+
+
+
+
+
+
+gem install oversip

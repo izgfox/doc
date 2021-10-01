@@ -1,0 +1,115 @@
+﻿openvpn подготовка
+yum update
+yum install mc
+ifconfig
+mcedit /etc/selinux/config.
+/etc/init.d/iptables stop
+chkconfig iptables off
+yum install openvpn
+yum install gcc make rpm-build autoconf.noarch zlib-devel pam-devel openssl-devel -y
+wget http://openvpn.net/release/lzo-1.08-4.rf.src.rpm
+yum install wget
+wget http://openvpn.net/release/lzo-1.08-4.rf.src.rpm
+wget http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.2-1.el6.rf.i686.rpm
+rm rpmforge-release-0.5.2-1.el6.rf.i686.rpm
+wget http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.2-2.el6.rf.x86_64.rpm
+rpmbuild --rebuild lzo-1.08-4.rf.src.rpm
+rpm -Uvh lzo-*.rpm
+rpm -Uvh rpmforge-release*
+yum install openvpn -y
+
+генерация сертификата и ключа
+
+cp -R /usr/share/doc/openvpn-2.2.2/easy-rsa/ /etc/openvpn/
+mcedit /etc/openvpn/easy-rsa/2.0/vars
+cd /etc/openvpn/easy-rsa/2.0
+chmod 755 *
+source ./vars
+./vars
+./clean-all
+./build-ca
+./build-key-server server
+./build-dh
+vi /etc/openvpn/server.conf
+ifconfig
+mcedit /etc/openvpn/server.conf.
+mc
+. ./vars
+./build-key kraken
+
+необходимые операии
+
+nano /etc/openvpn/easy-rsa/2.0/vars
+Строку:
+
+export KEY_CONFIG='$EASY_RSA/whichopensslcnf $EASY_RSA'
+
+Заменить на:
+
+export KEY_CONFIG=/etc/openvpn/easy-rsa/2.0/openssl-1.0.0.cnf
+
+echo 1 > /proc/sys/net/ipv4/ip_forward
+for vpn in /proc/sys/net/ipv4/conf/*; do echo 0 > $vpn/accept_redirects; echo 0 > $vpn/send_redirects; done
+iptables -t nat -A POSTROUTING -j SNAT --to-source 10.1.4.10
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+конфигурация сервера
+port 1729 #- port
+proto tcp-server #- protocol
+dev tun
+tun-mtu 1500
+tun-mtu-extra 32
+mssfix 1450
+reneg-sec 0
+plugin /usr/share/openvpn/plugin/lib/openvpn-auth-pam.so /etc/pam.d/login #- Comment this line if you are using FreeRADIUS
+#plugin /etc/openvpn/radiusplugin.so /etc/openvpn/radiusplugin.cnf #- Uncomment this line if you are using FreeRADIUS
+client-cert-not-required
+username-as-common-name
+push "redirect-gateway def1"
+#push "dhcp-option DNS 8.8.8.8"
+#push "dhcp-option DNS 8.8.4.4"
+keepalive 5 30
+comp-lzo
+persist-key
+persist-tun
+status /tmp/status_openvpn.log
+log-append /tmp/openvpn.log
+verb 3
+cipher DES-EDE3-CBC
+ca /etc/openvpn/easy-rsa/2.0/keys/ca.crt
+cert /etc/openvpn/easy-rsa/2.0/keys/server.crt
+key /etc/openvpn/easy-rsa/2.0/keys/server.key
+dh /etc/openvpn/easy-rsa/2.0/keys/dh1024.pem
+#tls-auth /etc/openvpn/easy-rsa/2.0/keys/ta.key 0
+server 10.15.0.0 255.255.255.0
+#push "dhcp-option DNS 10.15.0.1"
+route 10.15.0.0 255.255.255.0
+
+конфигурация клиента
+client
+dev tun
+proto tcp
+remote 37.193.15.211 1729
+resolv-retry infinite
+nobind
+tun-mtu 1500
+tun-mtu-extra 32
+mssfix 1450
+persist-key
+persist-tun
+ca "H:\\openvpn\\apteki\\ca.crt"
+cipher DES-EDE3-CBC
+auth-user-pass
+comp-lzo
+reneg-sec 0
+verb 3
+
+создание пользователя
+useradd atkna -s /bin/false
+passwd atkna
+
+
+
+
+запуск
+/etc/init.d/openvpn start && tail -f /tmp/openvpn.log

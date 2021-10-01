@@ -1,1 +1,0 @@
-rsync --list-only --info=stats2,misc1,flist0  -h rsync://slackware.tsu.ru/slackware/slackware64-current/ | sort -r | head -n 100

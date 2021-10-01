@@ -1,0 +1,173 @@
+view plaincopy to clipboardprint?
+[root@srv6 ~]# mkdir /usr/java    
+
+
+Change to the /usr/java directory we created
+
+view plaincopy to clipboardprint?
+[root@srv6 ~]# cd /usr/java    
+[root@srv6 java ]#   
+
+
+Download the appropriate JDK and save it to /usr/java directory we created above.
+
+Unpack jdk-7u5-linux-x64.tar.gz in the /usr/java directory using tar -xzf:
+
+view plaincopy to clipboardprint?
+[root@srv6 java]# tar -xzf jdk-7u5-linux-x64.tar.gz  
+
+
+This will create the directory /usr/java/jdk1.7.0_05. This will be our JAVA_HOME.
+
+
+We can now set JAVA_HOME and put Java into the path of our users.
+
+To set it for your current session, you can issue the following from the CLI:
+view plaincopy to clipboardprint?
+[root@srv6 java]# JAVA_HOME=/usr/java/jdk1.7.0_05  
+[root@srv6 java]# export JAVA_HOME  
+[root@srv6 java]# PATH=$JAVA_HOME/bin:$PATH  
+[root@srv6 java]# export PATH  
+
+To set the JAVA_HOME permanently, however, we need to add below to the ~/.bash_profile of the user (in this case, root). 
+We can also add it /etc/profile and then source it to give to all users.
+view plaincopy to clipboardprint?
+JAVA_HOME=/usr/java/jdk1.7.0_05  
+export JAVA_HOME  
+PATH=$JAVA_HOME/bin:$PATH  
+export PATH  
+Once you have added the above to ~/.bash_profile, you should log out, then log back in and check that the JAVA_HOME is set correctly.
+
+view plaincopy to clipboardprint?
+[root@srv6 ~]#  echo $JAVA_HOME  
+/usr/java/jdk1.7.0_05  
+
+
+Note: If you decided to use JDK 6 rather than 7 as we did above, simply save the JDK 6 bin file to /opt (or another location), then navigate to /usr/java and issue: 'sh /opt/jdk-6u33-linux-x64.bin'. This will create a JAVA Home of /usr/java/jdk1.6.0.33 
+
+
+Step 2: Download and Unpack Tomcat 7.0.29 (or latest)
+
+
+
+We will install Tomcat 7 under /usr/share.
+
+Switch to the /usr/share directory:
+
+view plaincopy to clipboardprint?
+[root@srv6 ~]# cd /usr/share  
+[root@srv6 share ]#   
+Download apache-tomcat-7.0.29.tar.gz (or the latest version) here
+
+and save it to /usr/share
+
+Once downloaded, you should verify the MD5 Checksum for your Tomcat download using the md5sum command.
+
+view plaincopy to clipboardprint?
+[root@srv6 share ]# md5sum apache-tomcat-7.0.29.tar.gz  
+307076fa3827e19fa9b03f3ef7cf1f3f *apache-tomcat-7.0.29.tar.gz  
+Compare the output above to the MD5 Checksum provided next to the download link and you used above and check that it matches. 
+
+unpack the file using tar -xzf:
+
+view plaincopy to clipboardprint?
+[root@srv6 share ]# tar -xzf apache-tomcat-7.0.29.tar.gz    
+This will create the directory /usr/share/apache-tomcat-7.0.29
+
+
+Step 3: Configure Tomcat to Run as a Service.
+
+
+
+We will now see how to run Tomcat as a service and create a simple Start/Stop/Restart script, as well as to start Tomcat at boot.
+
+Change to the /etc/init.d directory and create a script called 'tomcat' as shown below.
+
+view plaincopy to clipboardprint?
+[root@srv6 share]# cd /etc/init.d  
+[root@srv6 init.d]# vi tomcat  
+And here is the script we will use.
+
+view plaincopy to clipboardprint?
+#!/bin/bash  
+# description: Tomcat Start Stop Restart  
+# processname: tomcat  
+# chkconfig: 234 20 80  
+JAVA_HOME=/usr/java/jdk1.7.0_05  
+export JAVA_HOME  
+PATH=$JAVA_HOME/bin:$PATH  
+export PATH  
+CATALINA_HOME=/usr/share/apache-tomcat-7.0.29  
+  
+case $1 in  
+start)  
+sh $CATALINA_HOME/bin/startup.sh  
+;;   
+stop)     
+sh $CATALINA_HOME/bin/shutdown.sh  
+;;   
+restart)  
+sh $CATALINA_HOME/bin/shutdown.sh  
+sh $CATALINA_HOME/bin/startup.sh  
+;;   
+esac      
+exit 0  
+The above script is simple and contains all of the basic elements you will need to get going. 
+
+As you can see, we are simply calling the startup.sh and shutdown.sh scripts located in the Tomcat bin directory (/usr/share/apache-tomcat-7.0.29/bin). 
+
+You can adjust your script according to your needs and, in subsequent posts, we'll look at additional examples.
+
+CATALINA_HOME is the Tomcat home directory (/usr/share/apache-tomcat-7.0.29)
+
+Now, set the permissions for your script to make it executable:
+
+view plaincopy to clipboardprint?
+[root@srv6 init.d]# chmod 755 tomcat  
+We now use the chkconfig utility to have Tomcat start at boot time. In my script above, I am using chkconfig: 234 20 80. 2345 are the run levels and 20 and 80 are the stop and start priorities respectively. You can adjust as needed.
+
+view plaincopy to clipboardprint?
+[root@srv6 init.d]# chkconfig --add tomcat  
+[root@srv6 init.d]# chkconfig --level 234 tomcat on  
+Verify it:
+
+view plaincopy to clipboardprint?
+[root@srv6 init.d]# chkconfig --list tomcat  
+tomcat          0:off   1:off   2:on    3:on    4:on    5:off   6:off  
+Now, let's test our script.
+
+Start Tomcat:
+view plaincopy to clipboardprint?
+[root@srv6 ~]# service tomcat start  
+Using CATALINA_BASE:   /usr/share/apache-tomcat-7.0.29  
+Using CATALINA_HOME:   /usr/share/apache-tomcat-7.0.29  
+Using CATALINA_TMPDIR: /usr/share/apache-tomcat-7.0.29/temp  
+Using JRE_HOME:        /usr/java/jdk1.7.0_05  
+Using CLASSPATH:       /usr/share/apache-tomcat-7.0.29/bin/bootstrap.jar:/usr/share/apache-tomcat-7.0.29/bin/tomcat-juli.jar  
+Stop Tomcat:
+
+view plaincopy to clipboardprint?
+[root@srv6 ~]# service tomcat stop  
+Using CATALINA_BASE:   /usr/share/apache-tomcat-7.0.29  
+Using CATALINA_HOME:   /usr/share/apache-tomcat-7.0.29  
+Using CATALINA_TMPDIR: /usr/share/apache-tomcat-7.0.29/temp  
+Using JRE_HOME:        /usr/java/jdk1.7.0_05  
+Using CLASSPATH:       /usr/share/apache-tomcat-7.0.29/bin/bootstrap.jar:/usr/share/apache-tomcat-7.0.29/bin/tomcat-juli.jar  
+Restarting Tomcat (Must be started first):
+
+view plaincopy to clipboardprint?
+[root@srv6 ~]# service tomcat restart  
+Using CATALINA_BASE:   /usr/share/apache-tomcat-7.0.29  
+Using CATALINA_HOME:   /usr/share/apache-tomcat-7.0.29  
+Using CATALINA_TMPDIR: /usr/share/apache-tomcat-7.0.29/temp  
+Using JRE_HOME:        /usr/java/jdk1.7.0_05  
+Using CLASSPATH:       /usr/share/apache-tomcat-7.0.29/bin/bootstrap.jar:/usr/share/apache-tomcat-7.0.29/bin/tomcat-juli.jar  
+Using CATALINA_BASE:   /usr/share/apache-tomcat-7.0.29  
+Using CATALINA_HOME:   /usr/share/apache-tomcat-7.0.29  
+Using CATALINA_TMPDIR: /usr/share/apache-tomcat-7.0.29/temp  
+Using JRE_HOME:        /usr/java/jdk1.7.0_05  
+Using CLASSPATH:       /usr/share/apache-tomcat-7.0.29/bin/bootstrap.jar:/usr/share/apache-tomcat-7.0.29/bin/tomcat-juli.jar  
+We should review the Catalina.out log located at /usr/share/apache-tomcat-7.0.29/logs/catalina.out and check for any errors.
+
+view plaincopy to clipboardprint?
+[root@srv6 init.d]# more /usr/share/apache-tomcat-7.0.29/logs/catalina.out  

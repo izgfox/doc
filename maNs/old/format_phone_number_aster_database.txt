@@ -1,0 +1,13 @@
+CREATE TEMPORARY table calls_bak (SELECT cid from calls WHERE LENGTH(cid) = 11);
+
+select * from calls_bak
+
+
+
+
+ UPDATE calls a 
+   JOIN calls_bak b ON a.cid = b.cid  
+   SET a.cid = SUBSTR(a.cid, 2)
+
+
+drop table calls_bak

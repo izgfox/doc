@@ -1,0 +1,73 @@
+#Agents
+$Self->{'AuthModule'} = 'Kernel::System::Auth::LDAP';
+$Self->{'AuthModule::LDAP::Host'} = '172.18.16.185';
+$Self->{'AuthModule::LDAP::BaseDN'} = 'DC=power,DC=rb';
+$Self->{'AuthModule::LDAP::UID'} = 'sAMAccountName';
+$Self->{'AuthModule::LDAP::GroupDN'} = 'CN=OTRSagents,CN=Users,DC=power,DC=rb';
+$Self->{'AuthModule::LDAP::AccessAttr'} = 'member';
+$Self->{'AuthModule::LDAP::UserAttr'} = 'DN';
+$Self->{'AuthModule::LDAP::SearchUserDN'} = 'CN=root,CN=Users,DC=power,DC=rb';
+$Self->{'AuthModule::LDAP::SearchUserPw'} = '21445196';
+$Self->{'AuthModule::LDAP::AlwaysFilter'} = '';
+$Self->{'AuthModule::LDAP::Params'} = {
+port => 3268,
+timeout => 120,
+async => 0,
+version => 3,
+};
+$Self->{'AuthSyncModule'} = 'Kernel::System::Auth::Sync::LDAP';
+$Self->{'AuthSyncModule::LDAP::Host'} = '172.18.16.185';
+$Self->{'AuthSyncModule::LDAP::BaseDN'} = 'DC=power,DC=rb';
+$Self->{'AuthSyncModule::LDAP::UID'} = 'sAMAccountName';
+$Self->{'AuthSyncModule::LDAP::SearchUserDN'} = 'CN=root,CN=Users,DC=power,DC=rb';
+$Self->{'AuthSyncModule::LDAP::SearchUserPw'} = '21445196';
+$Self->{'AuthSyncModule::LDAP::UserSyncMap'} = {
+UserFirstname => 'givenName',
+UserLastname => 'sn',
+UserEmail => 'mail',
+};
+$Self->{'AuthSyncModule::LDAP::Params'} = {
+port => 389,
+timeout => 120,
+async => 0,
+version => 3,
+};
+$Self->{'AuthSyncModule::LDAP::UserSyncInitialGroups'} = [
+'users', 'basic_admin',
+];
+
+
+#Customers
+$Self->{CustomerUser} = {
+Name => 'AD',
+Module => 'Kernel::System::CustomerUser::LDAP',
+Params => {
+Host => '172.18.16.185',
+BaseDN => 'DC=power,DC=rb',
+SSCOPE => 'sub',
+UserDN => 'CN=root,CN=Users,DC=power,DC=rb',
+UserPw => '21445196',
+SourceCharset => 'utf-8',
+DestCharset => 'utf-8',
+},
+AlwaysFilter => '',
+CustomerKey => 'sAMAccountName',
+CustomerID => 'sAMAccountName',
+CustomerUserListFields => ['sAMAccountName', 'mail'],
+CustomerUserSearchFields => ['sAMAccountName', 'cn', 'mail'],
+CustomerUserSearchPrefix => '',
+CustomerUserSearchSuffix => '*',
+CustomerUserSearchListLimit => 10000,
+CustomerUserPostMasterSearchFields => ['mail'],
+CustomerUserNameFields => ['givenname', 'sn'],
+CustomerUserExcludePrimaryCustomerID => 0,
+AdminSetPreferences => 0,
+Map => [
+[ 'UserFirstname', 'Firstname', 'givenname', 1, 1, 'var', ],
+[ 'UserLastname', 'Lastname', 'sn', 1, 1, 'var', ],
+[ 'UserLogin', 'Username', 'sAMAccountName', 1, 1, 'var', ],
+[ 'UserEmail', 'Email', 'mail', 1, 1, 'var', ],
+[ 'UserCustomerID', 'CustomerID', 'mail', 0, 1, 'var', ],
+[ 'UserPhone', 'Phone', 'telephonenumber', 1, 0, 'var', ],
+],
+};

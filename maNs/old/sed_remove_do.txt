@@ -1,0 +1,6 @@
+﻿С верху
+sed '1,/2015-10-20_10/ d' </var/tmp/catalina.out  > /var/tmp/catalina_new.out 
+
+
+С низу
+sed '/2015-03-18_12/,$ d' < /tmp/catalina_new2.out > /tmp/catalina_new3.out

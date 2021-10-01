@@ -1,0 +1,16 @@
+. ./vars
+ ./clean-all
+ ./build-ca
+ ./build-key-server server
+ ./build-dh
+ ./build-key kraken
+
+
+
+cd /etc/openvpn/easy-rsa/2.0/
+
+. ./vars 
+
+./revoke-full client2
+
+

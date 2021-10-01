@@ -1,0 +1,218 @@
+﻿### Подготовительный этап ########################
+Берем архив install.tar.gz , копируем в / сервера
+### Распаковываем архив с дистрибутивом
+cd / && tar xzvf install.tar.gz
+### Устанавливаем текстовые редакторы и архиватор
+yum install mc nano zip unzip
+
+###################################################
+### Устанавливаем jdk #############################
+
+rpm -ivh /install/jdk-7u65-linux-x64.rpm
+
+### Устанавливаем orientdb ########################
+groupadd orient
+useradd -g orient orient
+passwd orient
+cp /install/orientdb-community-1.7.8.tar.gz /opt/ 
+cd /opt
+tar xzvf orientdb-community-1.7.8.tar.gz
+mv orientdb-community-1.7.8 orientdb
+chown -R orient:orient /opt/orientdb
+cd  ./orientdb
+chmod -R 755 bin/
+chmod -R 777 config/
+### Активируем сервис ###############################
+cp /install/init.d/orientdb /etc/init.d/
+chkconfig --add orientdb
+chkconfig orientdb on
+mcedit /opt/orientdb/bin/orientdb.sh
+ {
+ORIENTDB_DIR="/opt/orientdb"
+ORIENTDB_USER="orient"
+ }
+service orientdb start
+http://ip_arddr:2480/
+#####################################################
+### Создаем базу данных и проверяем коннект к ней ###
+/opt/orientdb/bin/console.sh create database plocal:/opt/orientdb/databases/visdb
+/opt/orientdb/bin/console.sh connect plocal:/opt/orientdb/databases/visdb/ admin admin
+ chown -R orient:orient /opt/orientdb/ 
+
+#####################################################
+### Устанавливаем сервер приложений wildfly ######### 
+groupadd wildfly
+useradd -g wildfly wildfly
+cp /install/wildfly-8.1.0.Final.zip /opt/
+cd /opt
+unzip wildfly-8.1.0.Final.zip
+mv wildfly-8.1.0.Final wildfly
+cp /install/init.d/wildfly /etc/init.d/wildfly
+cp /install/wildfly.conf /etc/default/wildfly.conf
+chown -R wildfly:wildfly /opt/wildfly
+chown wildfly:wildfly /etc/default/wildfly.conf
+### Подменяем в standalone.xml 127.0.0.1 на 0.0.0.0 с помощью sed ####
+cat /opt/wildfly/standalone/configuration/standalone.xml | sed 's/127.0.0.1/0.0.0.0/g' > /opt/wildfly/standalone/configuration/standalone0.xml
+rm -f  /opt/wildfly/standalone/configuration/standalone.xml
+mv /opt/wildfly/standalone/configuration/standalone0.xml /opt/wildfly/standalone/configuration/standalone.xml
+chown -R wildfly:wildfly /opt/wildfly
+#######################################################################
+### Активируем сервис #################################################
+chkconfig --add wildfly
+chkconfig wildfly on
+service wildfly start
+http://192.168.154.120:8080/
+### Разворачиваем поисковик solr #######################################
+cp -r /install/solr_home/ /opt/
+/opt/wildfly/bin/jboss-cli.sh --connect controller=192.168.154.120
+deploy /install/solr.war
+http://192.168.154.120:8080/solr/#/
+exit
+
+####################### Альтернативный вариант ########################
+cd /install
+tar xzvf solr-4.4.0.tgz
+mv solr-4.4.0 /opt/solr
+cp -r /opt/solr/example/solr/collection1 /opt/solr/example/solr/vis_test
+echo "name=vis_test" > /opt/solr/example/solr/vis_test/core.properties
+
+делаем инит скрипт следующего содержания
+
+touch /etc/init.d/solr
+
+
+
+#!/bin/sh -e
+
+#Starts, stops, and restarts solr
+#chkconfig: 2345 95 20
+#description: apache-solr
+#processname: solr
+
+SOLR_DIR="/opt/solr/example"
+JAVA_OPTIONS="-Xmx1024m -DSTOP.PORT=8079 -DSTOP.KEY=mustard -jar start.jar"
+LOG_FILE="/opt/solr/solr.log"
+JAVA="/usr/bin/java"
+
+case $1 in
+    start)
+        echo "Starting Solr"
+        cd $SOLR_DIR
+        $JAVA $JAVA_OPTIONS 2> $LOG_FILE &
+        ;;
+    stop)
+        echo "Stopping Solr"
+        cd $SOLR_DIR
+        $JAVA $JAVA_OPTIONS --stop
+        ;;
+    restart)
+        $0 stop
+        sleep 1
+        $0 start
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}" >&2
+        exit 1
+        ;;
+esac
+
+######
+chmod +x /etc/init.d/solr
+chkconfig --add solr
+chkconfig solr on
+service solr start
+
+curl http://localhost:8983/solr/vis_test/select?q=*:*
+
+
+
+
+
+### Деплой приложения VIS ##############################################
+правим файлы внутри архива /install/ROOT.war
+1) /WEB-INF/classes/orient.properties 
+{
+orient.dburl=remote:localhost/visdb
+orient.username=admin
+orient.password=admin
+}
+2) /WEB-INF/classes/logging.properties
+{
+ handler.FILE.fileName=/opt/wildfly/standalone/log/server.log
+}
+3) /WEB-INF/classes/solr.properties
+{
+solr.url=http://your_ip_addr:8080/solr/vis_test
+solr.max.retries=1
+solr.connection.timeout=5000
+solr.max.connection.per.host=100
+solr.max.total.connections=100
+solr.follow.redirects=false
+solr.allow.compression=false
+}
+
+4) /WEB-INF/classes/actfs.properties
+{
+atcfs.url=http://192.168.120.86:8088/atcfs
+#atcfs.url=http://localhost:8088/atcfs
+atcfs.vis_id=test_vis
+atcfs.secret_key=secret1
+atcfs.default_user_name=system
+}
+
+правим
+nano /opt/wildfly/standalone/configuration/standalone.xml
+
+в секции   
+<subsystem xmlns="urn:jboss:domain:security:1.2">
+            <security-domains>
+                ...
+            </security-domains>
+        </subsystem>
+
+		добавляем
+        
+        <security-domain name="jaasVis" cache-type="default">
+                    <authentication>
+                        <login-module code="com.ats.vis.security.VisLoginModule" flag="required">
+                            <module-option name="hashAlgorithm" value="SHA-256"/>
+                            <module-option name="hashEncoding" value="hex"/>
+                        </login-module>
+                    </authentication>
+         </security-domain>
+
+
+Открываем:
+
+WILDFLY_HOME\modules\system\layers\base\sun\jdk\main\service-loader-resources\META-INF\services\javax.script.ScriptEngineFactory
+
+и удаляем следующую строчку:
+
+jdk.nashorn.api.scripting.NashornScriptEngineFactory
+
+После этого непонятные эксепшены перестанут появляться.
+
+
+
+рестартуем wildfly
+
+service wildfly restart
+
+деплоим ROOT.war
+/opt/wildfly/bin/jboss-cli.sh --connect controller=192.168.154.120
+deploy /install/ROOT.war
+exit
+проверяем
+http://your_ip_addr:8080/
+
+
+
+
+		 
+######## Готово ########################################################
+reboot
+
+
+
+
+

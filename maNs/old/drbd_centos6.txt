@@ -1,0 +1,105 @@
+ yum install make gcc kernel-devel flex rpm-build libxslt wget mc ntpdate
+5 * * * * root ntpdate 192.168.120.92
+
+
+cd /tmp && wget -q -O - http://oss.linbit.com/drbd/8.4/drbd-8.4.4.tar.gz | tar zxvf -
+
+cd drbd-8.4.4/
+
+./configure --with-utils --with-km --with-udev --with-rgmanager --with-bashcompletion --prefix=/usr --localstatedir=/var --sysconfdir=/etc
+make
+make install
+
+(если обновили €дро то )make module
+
+modprobe drbd
+
+собираем фс
+dd if=/dev/zero of=/drbd-loop.img bs=1M count=1000
+
+
+keepalive_node1:# drbdadm create-md data-lower
+
+keepalive_node2:# drbdadm create-md data-lower
+
+keepalive_node1:# /etc/init.d/drbd start
+
+keepalive_node2:# /etc/init.d/drbd start
+
+cat /proc/drbd
+
+keepalive_node1:/# drbdadm -- --overwrite-data-of-peer primary data-lower
+keepalive_node1:/# cat /proc/drbd
+
+keepalive_node1:~# drbdadm --stacked create-md data-upper
+
+keepalive_node3:# drbdadm create-md data-upper
+
+keepalive_node1:/# drbdadm --stacked adjust data-upper
+
+keepalive_node3:~# drbdadm adjust data-upper
+keepalive_node3:~# cat /proc/drbd
+
+keepalive_node1:~# drbdadm --stacked -- --overwrite-data-of-peer primary data-upper
+keepalive_node1:~# cat /proc/drbd
+
+(ifconfig eth0:1 192.168.154.85) подн€ть на мастере
+
+#############################config#################################
+global { usage-count yes; }
+
+resource data-lower {
+  protocol C;
+  net {
+    shared-secret "LINBIT";
+  }
+syncer {
+<------>rate 12M;
+}
+
+  on keepalive_node1 {
+    device     /dev/drbd1;
+    disk       /dev/loop7;
+    address    192.168.154.81:7788;
+    meta-disk  internal;
+  }
+
+  on keepalive_node2 {
+    device    /dev/drbd1;
+    disk      /dev/loop7;
+    address   192.168.154.82:7788;
+    meta-disk internal;
+  }
+}
+
+  resource data-upper {
+
+net {
+    protocol A;
+     }
+
+  syncer {
+    rate 12M;
+    al-extents 513;
+  }
+..
+  stacked-on-top-of data-lower {
+        device /dev/drbd3;
+        address 192.168.154.85:7788; # IP provided by Heartbeat
+        }
+
+  on keepalive_node3 {
+    device     /dev/drbd3;
+    disk       /dev/loop7;
+    address    192.168.154.84:7788; # Public IP of the backup node
+    meta-disk  internal;
+  }
+}
+###########################hosts################################################
+
+192.168.154.81 keepalive_node1 keepalive_node1.at-sibir.ru
+192.168.154.82 keepalive_node2 keepalive_node2.at-sibir.ru
+192.168.154.84 keepalive_node3 keepalive_node3.at-sibir.ru
+
+
+

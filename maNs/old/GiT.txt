@@ -1,0 +1,113 @@
+совсем немного рабочего тут:
+https://sachinsharm.wordpress.com/2013/10/04/installsetup-and-configure-git-server-with-gitolite-and-gitweb-on-centosrhel-6-4/
+http://sharadchhetri.com/2013/06/01/how-to-install-own-git-server-with-ssh-and-http-access-by-using-gitolite-and-gitweb-in-centos/
+
+
+
+yum -н install git gitweb 
+yum -y install perl-Data-Dumper-Names.noarch perl-Data-Dumper-Concise.noarch perl-Time-HiRes
+
+
+# useradd git
+   # usermod -u 600 git
+   # groupmod -g 600 git
+
+cd фолдер проекта
+git init
+git add ./*
+(git add ./*.conf)
+git commit -m '1.0'
+git status
+git remote
+git remote add vconf 192.168.120.148:/asterisk/dev/git
+git remote -v
+
+git daemon --reuseaddr --base-path=/asterisk/dev/git/ /asterisk/dev/git/ &
+
+
+cd фолдер проекта
+git clone  root@192.168.120.148:/asterisk/dev/git vconf
+git pull  root@192.168.120.148:/asterisk/dev/git master
+
+
+пушить в мастера
+git checkout -b production   (git merge master)
+Правим файл .git/hooks/post-receive. Содержимое должно быть таким:
+#!/bin/sh
+cd ..
+env -i git merge --ff-only master
+
+
+Такая настройка позволяет оставить удаленный репозиторий с текущей веткой production. А каждый push в этот репозиторий будет вызывать merge ветки master в production, что будет фактически обновлять файлы в рабочем каталоге.
+
+Не забываем выставить разрешение на запуск скрипта:
+chmod +x .git/hooks/post-receive
+
+
+Радуемся и возвращаемся в песочницу. Теперь можно обновлять продакшн простой командой git push server master.
+
+Приятные дополнения
+
+В конец файла .git/hooks/post-receive можно добавить вызов какого либо скрипта, выполнение которого необходимо для полного развертывания кода. Например, очистка кэша, сборка файлов локали, обновление БД и т.д…
+
+
+gitweb
+yum install gitweb -y
+mv /var/www/git /var/www/html/gitweb
+
+
+
+администрирование gitolite
+ git clone git@videoconference:gitolite-admin.git
+
+
+начальный файл с правами обязательно такой :
+
+repo gitolite-admin
+    RW+     =   git142
+
+repo @all
+    R       =   gitweb daemon
+
+
+ git clone git142@gitexpl:gitolite-admin.git
+проекты:
+
+
+git clone http://git:briv31so2@videoconference/git/videoconference.git
+
+git clone http://git142:briv31so2@gitexpl/git/backup.git
+
+git push origin master
+
+
+
+
+git clone http://kraken:briv31so2@videoconference/git/videoconference.git
+
+
+
+
+
+
+
+
+
+git commit -m '1.0'
+
+
+create repo on server
+
+ # su -l git
+   $ cd repositories
+
+   $ mkdir test-repo.git
+   $ cd test-repo.git
+   $ git --bare init
+   $ git update-server-info
+
+
+
+
+
+

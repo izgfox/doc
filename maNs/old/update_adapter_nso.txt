@@ -1,0 +1,14 @@
+cd $updatedir
+scp -P 22151 -r 2015-07-23 root@81.1.205.10:/tmp/
+password=fCgUx4ixQc00wn
+ssh root@81.1.205.10 -p 22151
+fCgUx4ixQc00wn
+ssh root@192.168.133.147
+xnvQaS2QYYZZFi
+ssh root@192.168.133.147
+xnvQaS2QYYZZFi
+cd /tmp
+pg_dump -h 192.168.133.146 -U adapters adaptersdb > adaptersdb_nso_$date.sql
+mkdir /backup/$date
+cp -r /var/lib/tomcat6/webapps/adapter-web /backup/$date/
+ cp  /var/lib/tomcat6/webapps/adapter-web.war /backup/$date/

@@ -1,0 +1,5 @@
+postconf mynetworks
+mynetworks = 127.0.0.0/8 10.10.130.0/24
+Add the remote machine like this:
+zmprov ms mail.nix-tech.ru zimbraMtaMyNetworks '127.0.0.0/8 192.168.120.0/24 109.207.4.193/32 195.46.122.237/32 81.1.202.95/32'
+postfix reload

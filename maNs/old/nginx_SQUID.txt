@@ -1,0 +1,13 @@
+ location /adapter-web/ {
+  
+            
+          #  proxy_pass http://mais.nso.ru/adapter-web/;
+  
+           
+    proxy_set_header  X-Real-IP $remote_addr;
+    proxy_set_header  Host mais.nso.ru;
+    proxy_set_header  Request-URI mais.nso.ru;
+    proxy_pass http://172.29.0.5:3128;
+    proxy_redirect off;
+
+        }

@@ -1,0 +1,203 @@
+yum -y groupinstall "Development Tools"  
+yum -y install git mc wget httpd perl-Time-HiRes zlib-devel perl-ExtUtils-MakeMaker asciidoc xmlto openssl-devel
+git clone git://git.kernel.org/pub/scm/git/git.git git27
+cd git27
+make configure
+mkdir -p /git/gitinstalls
+./configure --prefix=/git/gitinstalls
+make all doc
+make install install-doc install-html
+
+
+# на клиенте
+groupadd git142
+useradd -g git142 git142
+cd /home/git142/
+su -l git142
+ssh-keygen -t rsa -C "git142"
+scp ./.ssh/id_rsa.pub root@gitexpl:/tmp/
+
+mv ./.ssh/id_rsa.pub ./.ssh/git142.pub
+
+git config --global user.name "git142"
+git config --global user.email izgfox@mail.ru
+
+echo "PATH=/home/git142/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin" >> ./.bashrc
+# на сервере
+useradd git142
+usermod -u 600 git142
+groupmod -g 600 git142
+mv /tmp/id_rsa.pub /home/git142/git142.pub
+chown git142:git142 /home/git142/git142.pub
+
+git config --global user.name "git142"
+git config --global user.email izgfox@mail.ru
+
+(устанавливается для каждого пользователя)
+
+echo "PATH=/home/git142/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin" >> ./.bashrc
+
+su -l git142
+git clone git://github.com/sitaramc/gitolite
+mkdir -p /home/git142/bin
+gitolite/install -to ~/bin
+gitolite setup -pk $HOME/git142.pub
+exit
+
+[root@gitexpl home]# suexec -V
+ -D AP_DOC_ROOT="/var/www"
+ -D AP_GID_MIN=100
+ -D AP_HTTPD_USER="apache"
+ -D AP_LOG_EXEC="/var/log/httpd/suexec.log"
+ -D AP_SAFE_PATH="/usr/local/bin:/usr/bin:/bin"
+ -D AP_UID_MIN=500
+ -D AP_USERDIR_SUFFIX="public_html"
+
+ 
+
+ chown -R git142:git142 /var/www/bin
+ chmod 755 /var/www/bin
+ chmod 750 /var/www/bin/gitolite-suexec-wrapper.sh
+ 
+ mcedit /home/git142/.gitolite.rc
+ 
+ UMASK => 0027,
+ 
+ mkdir -p /var/www/gitweb && cp /git/gitinstalls/share/gitweb/static/* /var/www/gitweb/ && cp /git/gitinstalls/share/gitweb/gitweb.cgi /var/www/gitweb/
+ chown -R git142:git142 /var/www/html/gitweb
+ 
+ vi /etc/gitweb.conf
+===================================================== 
+our $projectroot = "/home/git142/repositories/";
+our $projects_list = "/home/git142/projects.list";
+$site_name = "Mega_GIT142";
+$favicon = "git-favicon.png";
+=====================================================
+ 
+ vi /var/www/html/gitweb/gitweb.cgi
+ ====================================================
+ our $projectroot = "/home/git142/repositories";
+ our $projects_list = "/home/git142/projects.list";
+ =====================================================
+ 
+ install -d -m 0755 -o git142 -g git142 /var/www/bin  
+  vi /var/www/bin/gitolite-suexec-wrapper.sh
+===============================================================
+#!/bin/bash
+#
+# Suexec wrapper for gitolite-shell
+#
+
+export GIT_PROJECT_ROOT="/home/git142/repositories"
+export GITOLITE_HTTP_HOME="/home/git142"
+
+exec ${GITOLITE_HTTP_HOME}/gitolite/src/gitolite-shell
+===============================================================
+install -d -m 0755 -o apache -g apache /var/www/git
+
+vi /etc/httpd/conf/httpd.conf
+==============================================================
+<VirtualHost *:80>
+    ServerName        gitexpl
+  # ServerAlias       gitserver
+  # ServerAdmin       youremailid@example.com
+
+    DocumentRoot /var/www/git
+    <Directory /var/www/git>
+        #Options       None
+        Options -Indexes
+        AllowOverride none
+        Order         allow,deny
+        Allow         from all
+
+    </Directory>
+
+    SuexecUserGroup git142 git142
+    ScriptAlias /git/ /var/www/bin/gitolite-suexec-wrapper.sh/
+    ScriptAlias /gitmob/ /var/www/bin/gitolite-suexec-wrapper.sh/
+
+    <Location /git>
+        AuthType Basic
+        AuthName "Git Access"
+        Require valid-user
+        AuthUserFile /etc/httpd/conf/git.passwd
+    </Location>
+</VirtualHost>
+==============================================================
+
+vi /etc/httpd/conf.d/git.conf 
+==============================================================
+ Alias /gitweb /var/www/html/gitweb
+
+<Directory /var/www/html/gitweb>
+  Options +ExecCGI
+  AddHandler cgi-script .cgi
+  DirectoryIndex gitweb.cgi
+</Directory>
+<Location /gitweb>
+   AuthType Basic
+   AuthName "Git Access"
+   Require valid-user
+   AuthUserFile /etc/httpd/conf/git.passwd
+</Location>
+
+============================================================== 
+ 
+в httpd.conf выставить нужное значение Timeout для пуша больших репозиториев 
+ 
+ htpasswd -c /etc/httpd/conf/git.passwd git142
+ 
+ htpasswd /etc/httpd/conf/git.passwd kraken
+ 
+ Создать репозиторий на сервере:
+     	
+    su -l admin
+    export repo_create="prod_nagios.git"
+    cd repositories
+    mkdir -p $repo_create
+    cd $repo_create
+    git --bare init
+    git update-server-info
+    echo $repo_create >> ../../projects.list
+	
+	
+ 
+ Отменить изменения add до коммита
+ git reset HEAD *
+ 
+ Удаление 
+ rm -rf то что надо
+ git add -u
+ git commit -m "очистка3"
+ git push origin master
+ 
+ 
+ 
+ 
+ администрирование gitolite
+ git clone git@videoconference:gitolite-admin.git
+
+
+начальный файл с правами обязательно такой :	
+
+repo gitolite-admin
+    RW+     =   git142
+
+repo @all
+    R       =   gitweb daemon
+
+
+ git clone git142@gitexpl:gitolite-admin.git
+проекты:
+
+
+git clone http://git:briv31so2@videoconference/git/videoconference.git
+
+git clone http://git142:briv31so2@gitexpl/git/backup.git
+
+git push origin master
+ 
+ 
+ 
+ 
+ 

@@ -1,0 +1,3 @@
+mcedit /etc/security/limits.conf
+
+orientdb         hard    noproc          10240

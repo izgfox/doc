@@ -1,0 +1,188 @@
+#
+=============================================================
+master node example start (192.168.120.130)
+cd /opt/solr/example
+java -Djetty.port=1500 -Dbootstrap_confdir=./solr/vis_test/conf -Dcollection.configName=myconf -DzkRun -DnumShards=2 -jar start.jar &
+slave node example start (192.168.120.131)
+cd /opt/solr/example
+java -DzkHost=192.168.120.130:2500 -jar start.jar &
+
+master node example2 start (192.168.120.131)
+cd /opt/solr/example2
+java -Djetty.port=1500 -Dbootstrap_confdir=./solr/vis_test/conf -Dcollection.configName=myconf -DzkRun -DnumShards=2 -jar start.jar &
+slave node example2 start (192.168.120.130)
+cd /opt/solr/example2
+java -DzkHost=192.168.120.131:2500 -jar start.jar &
+
+
+update :
+example
+cd /opt/solr/example/exampledocs/
+
+java -Durl=http://192.168.120.131:8983/solr/vis_test/update?commit=true -jar post.jar ipod_video.xml
+
+java -Durl=http://192.168.120.131:8983/solr/vis_test/update -jar post.jar monitor.xml
+
+
+
+
+
+
+rsync -Prv /opt/solr/example/solr/vis_test/data/* /opt/solr/example2/solr/vis_test/data/
+
+curl "http://192.168.120.131:1500/solr/admin/cores?action=RELOAD&core=vis_test&name=keyspace.table&reindex=true&deleteAll=false"
+
+
+
+
+
+
+
+
+
+curl 'http://localhost:8983/solr/admin/collections?action=CREATE&name=vis_test&numShards=2&replicationFactor=1&collection.configName=myconf'
+
+curl 'http://localhost:8983/solr/admin/collections?action=CREATE&name=vis_test2&numShards=2&replicationFactor=1&collection.configName=myconf2'
+
+
+
+shema 3:
+
+ssh to 192.168.120.130 -
+
+1. cd /opt/solr/example/solr
+
+2. cp -r vis_test vis_test2
+
+
+5. Edit solr.xml and make it look like this:
+
+<solr persistent="true">
+      <cores adminpath="/admin/cores" defaultcorename="vis_test" host="${host:}" hostcontext="${hostContext:}" hostport="${jetty.port:}" zkclienttimeout="${zkClientTimeout:15000}">
+      </cores>
+</solr>
+  
+
+6. cd /opt/solr/example
+
+7. Start solr : java -DzkRun -jar start.jar &
+
+8. Upload configs to zookeeper
+
+   a) cd /opt/solr/example/cloud-scripts
+   b) ./zkcli.sh -cmd upconfig -confdir /opt/solr/example/solr/vis_test/conf/ -confname myconf1 -z localhost:9983
+   c) ./zkcli.sh -cmd upconfig -confdir /opt/solr/example/solr/vis_test2/conf/ -confname myconf2 -z localhost:9983
+   
+ssh to 192.168.120.131
+
+1. Start solr on 192.168.120.131
+
+    a) cd /opt/solr/example/solr
+
+    b) Edit solr.xml and make it look like this:
+     
+<solr persistent="true">
+      <cores adminpath="/admin/cores" defaultcorename="vis_test" host="${host:}" hostcontext="${hostContext:}" hostport="${jetty.port:}" zkclienttimeout="${zkClientTimeout:15000}">
+      </cores>
+</solr>
+
+    c) cd /opt/solr/example
+
+    d) Start solr using zookeeper running on 192.168.120.130:
+          java -DzkHost=192.168.120.130:9983 -jar start.jar &
+
+ssh to 192.168.120.130:
+
+1. Create first collection (I created it on 192.168.120.130, however I think we can create this from anywhere as it's a HTTP call)
+
+curl 'http://localhost:8983/solr/admin/collections?action=CREATE&name=vis_test&numShards=2&replicationFactor=1&collection.configName=myconf1'
+
+2. Create second collection
+
+curl 'http://localhost:8983/solr/admin/collections?action=CREATE&name=vis_test2&numShards=2&replicationFactor=1&collection.configName=myconf2'
+
+
+==================================
+
+push
+ cd /opt/solr/example/exampledocs/
+  java -Durl=http://192.168.120.131:8983/solr/vis_test/update?commit=true -jar post.jar monitor.xml
+  
+  
+ replication
+ 
+ Setting up the master
+ 
+ mkdir master; cp -R example/* master/
+ pico master/solr/solr.xml
+ <cores adminPath="/admin/cores" defaultCoreName="project-master" host="${host:}" hostPort="${jetty.port:}" hostContext="${hostContext:}" zkClientTimeout="${zkClientTimeout:15000}">
+  <core name="project-master" instanceDir="project-master" />
+</cores>
+
+mv master/solr/collection1/ master/solr/project-master/
+
+pico master/solr/project-master/conf/solrconfig.xml
+
+<requestHandler name="/replication" class="solr.ReplicationHandler">
+  <lst name="master">
+    <str name="replicateAfter">startup</str>
+    <str name="replicateAfter">commit</str>
+    <str name="confFiles">schema.xml,stopwords.txt,elevate.xml</str>
+    <str name="commitReserveDuration">00:00:10</str>
+  </lst>
+  <str name="maxNumberOfBackups">1</str>
+</requestHandler>
+
+Setting up the slave
+
+mkdir slave; cp -R example/* slave/
+
+pico slave/solr/solr.xml
+
+<cores adminPath="/admin/cores" defaultCoreName="project-slave" host="${host:}" hostPort="${jetty.port:}" hostContext="${hostContext:}" zkClientTimeout="${zkClientTimeout:15000}">
+  <core name="project-slave" instanceDir="project-slave" />
+</cores>
+
+mv slave/solr/collection1/ slave/solr/project-slave/
+pico slave/solr/project-slave/conf/solrconfig.xml
+
+<requestHandler name="/replication" class="solr.ReplicationHandler" >
+  <lst name="slave">
+    <str name="masterUrl">http:⁄⁄localhost:8983/solr/project-master/replication</str>
+    <str name="pollInterval">00:00:20</str>
+    <str name="compression">internal</str>
+    <str name="httpConnTimeout">5000</str>
+    <str name="httpReadTimeout">10000</str>
+  </lst>
+</requestHandler>
+
+Enter the master directory and start the master using the following command:
+
+
+java -Denable.master=true -jar start.jar
+If everything is OK, you should see the following message: INFO:oejs.AbstractConnector:Started SocketConnector@0.0.0.0:8983
+
+We’ll use different port for the slave so enter its directory and run the following command:
+
+
+java -Djetty.port=8181 -Denable.slave=true -jar start.jar
+
+
+
+
+shema4
+cd /var/log && /opt/solr/zookeeper/bin/zkServer.sh start
+
+cd /opt/solr/example && java -Dbootstrap_confdir=./solr/vis_test/conf -Dcollection.configName=myconf -DzkHost=192.168.120.130:2181,192.168.120.131:2181,192.168.120.128:2181,192.168.120.129:2181 -DnumShards=2 -jar start.jar &
+cd /opt/solr/example && java -Dbootstrap_confdir=./solr/vis_test/conf -Dcollection.configName=myconf -DzkHost=192.168.120.130:2181,192.168.120.131:2181,192.168.120.128:2181,192.168.120.129:2181 -jar start.jar &
+
+
+cd /opt/solr/example && java -Dbootstrap_confdir=./solr/vis_test/conf -Dcollection.configName=myconf -jar start.jar &
+
+
+
+
+
+
+
+

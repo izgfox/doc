@@ -1,0 +1,47 @@
+CREATE ROLE adapters;
+CREATE DATABASE adaptersdb OWNER adapters;
+ALTER ROLE adapters ENCRYPTED PASSWORD '9cMOzgOiP';
+GRANT CONNECT ON DATABASE adaptersdb TO adapters;
+ALTER ROLE adapters LOGIN;
+
+
+CREATE ROLE mfc;
+CREATE DATABASE popularization OWNER mfc;
+ALTER ROLE mfc ENCRYPTED PASSWORD 'cpgu555';
+GRANT CONNECT ON DATABASE popularization TO mfc;
+ALTER ROLE mfc LOGIN;
+
+
+CREATE ROLE atcfs;
+CREATE DATABASE atcfs OWNER atcfs;
+ALTER ROLE atcfs ENCRYPTED PASSWORD 'cpgu555';
+GRANT CONNECT ON DATABASE atcfs TO atcfs;
+ALTER ROLE atcfs LOGIN;
+
+
+psql adapterdb -f /tmp/p5.sql
+pg_dump dbname > outfile
+
+Copy (select username from adp_user) To '/tmp/adpusers.csv' With CSV;
+
+
+db.url=jdbc:postgresql://192.168.133.172:5432/cpgu_new?charSet=UTF8
+db.username=mfc
+db.password=uioy789uUHSHjkh
+
+
+
+CREATE ROLE mfc;
+CREATE DATABASE cpgu_new OWNER mfc;
+ALTER ROLE mfc ENCRYPTED PASSWORD 'uioy789uUHSHjkh';
+GRANT CONNECT ON DATABASE cpgu_new TO mfc;
+ALTER ROLE mfc LOGIN;
+
+
+ 'spagobi'@'localhost'
+
+CREATE ROLE spagobi;
+CREATE DATABASE spagobi OWNER spagobi;
+ALTER ROLE spagobi ENCRYPTED PASSWORD 'spagobi';
+GRANT CONNECT ON DATABASE spagobi TO spagobi;
+ALTER ROLE spagobi LOGIN;

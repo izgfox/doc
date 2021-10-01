@@ -1,0 +1,12 @@
+select user(); select current_user();
+
+SELECT host,user,password,Grant_priv,Super_priv FROM mysql.user;
+
+UPDATE mysql.user SET Grant_priv='Y', Super_priv='Y' WHERE User='root';
+FLUSH PRIVILEGES;
+
+logout
+login
+
+
+GRANT ALL ON *.* TO 'root'@'localhost';

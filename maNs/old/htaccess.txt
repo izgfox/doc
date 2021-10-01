@@ -1,0 +1,31 @@
+cd /var/www/html/gg/
+
+vi .htaccess
+
+<Files iostat.php>
+AuthType Basic
+AuthName "Private zone. Only for administrator!"
+AuthUserFile  /var/www/html/gg/.htpasswd
+require valid-user
+</Files>
+<Files iostat_old.php>
+AuthType Basic
+AuthName "Private zone. Only for administrator!"
+AuthUserFile  /var/www/html/gg/.htpasswd
+require valid-user
+</Files>
+
+htpasswd -bcs .htpasswd kraken briv31so2
+htpasswd -bs .htpasswd kashin briv31so2
+
+vi /etc/httpd/conf/httpd.conf
+
+<Directory />
+    Options FollowSymLinks
+    AllowOverride All
+</Directory>
+
+
+/etc/init.d/httpd configtest
+
+/etc/init.d/httpd restart

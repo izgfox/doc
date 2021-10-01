@@ -1,0 +1,29 @@
+ifconfig eth0 down
+brctl addbr br0
+brctl setfd br0 0
+ifconfig br0 10.54.0.88 netmask 255.255.255.0 promisc up
+brctl addif br0 eth0
+ifconfig eth0 0.0.0.0 up
+ifconfig eth1 down
+brctl addbr br1
+brctl setfd br1 0
+ifconfig br1 0.0.0.0 promisc up
+brctl addif br1 eth1
+ifconfig eth1 0.0.0.0 up
+echo 1 > /proc/sys/net/ipv4/ip_forward
+echo 2202484736 > /proc/sys/kernel/shmmax
+
+route add -net 10.54.154.0 netmask 255.255.255.0 gateway 10.54.0.245
+route add -net 11.66.10.0 netmask 255.255.255.0 gateway 10.54.0.7
+mount -t ext3 -o loop /raid10/backup1c.fs /var/lib/lxc/1c/rootfs/backup/database/
+mount -t ext3 -o loop /raid1/1c.fs /var/lib/lxc/1c/rootfs/var/lib/pgsql
+mount -t ext3 -o loop /raid1/risk.fs /var/lib/lxc/tc/rootfs/var/risk
+mount -t ext3 -o loop /raid10/temp.fs /var/lib/lxc/tc/rootfs/var/share
+mount -t ext3 -o loop /raid1/citylit.fs /var/lib/lxc/tc/rootfs/var/citylit/
+mount -t ext3 -o loop /raid1/kons.fs /var/lib/lxc/kons/rootfs/var/share
+
+lxc-start -d -n 1c &
+lxc-start -d -n aster &
+lxc-start -d -n nagios &
+lxc-start -d -n ser &
+lxc-start -d -n tc &

@@ -1,0 +1,9 @@
+Delete ev . * FROM ExpandoTable et
+        INNER JOIN
+    ExpandoColumn ec ON et.tableId = ec.tableId
+        INNER JOIN
+    ExpandoValue ev ON ec.columnId = ev.columnId
+        Inner JOIN
+    EmDev_ServiceOrder so ON so.serviceOrderId = ev.classPK 
+WHERE
+    ec.name = 'signedResponse'

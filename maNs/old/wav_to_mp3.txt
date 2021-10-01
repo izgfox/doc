@@ -1,0 +1,1 @@
+find /var/rec/ -iname "*.wav" -exec lame  '{}' '{}'.mp3 ';'  -exec rm '{}' ';'

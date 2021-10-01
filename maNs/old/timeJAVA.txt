@@ -1,0 +1,11 @@
+
+для начала выполним тест времени на java
+
+java testTime     #testTime - в тикете выше
+
+java -jar tzupdater.jar -u -v # tzupdater.jar в tzupdater-2_0_0-2015a.zip в тикете выше
+
+java -jar tzupdater.jar -t -v
+
+PS.
+tzupdater.jar и testTime.class можно найти на Поинте 1 в /opt/

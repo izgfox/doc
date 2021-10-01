@@ -1,0 +1,32 @@
+node slave setup
+yum install wget
+
+echo "109.202.0.226   nagios.at-sibir.ru" >> /etc/hosts
+wget nagios.at-sibir.ru/node.tar.gz
+
+(deb)
+apt-get install php5 php5-common php5-cli vnstat sysstat
+mv /etc/init.d/apache2 /tmp/
+ update-rc.d rc.local start
+
+#groupadd nagcmd
+#useradd -g nagcmd nagios
+
+
+
+
+yum install php
+
+chown -R nagios /opt/node/
+
+ /opt/node/nagios/bin/nagios -v /opt/node/nagios/etc/nagios.cfg
+
+
+ scp -P 22151 /install/node.tar.gz root@81.1.205.10:
+
+http://pkgs.repoforge.org/vnstat/vnstat-1.11-1.el6.rf.x86_64.rpm
+
+/opt/node/nagios/bin/nagios -d /opt/node/nagios/etc/nagios.cfg
+
+
+interval_length=1 (1sec)

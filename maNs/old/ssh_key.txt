@@ -1,0 +1,13 @@
+$ ssh-keygen -t rsa -q -N '' -f ~/.ssh/id_rsa
+
+$ ssh-copy-id -i ~/.ssh/id_rsa user@remote.org.ua
+
+
+
+or
+
+
+remote$ [ -d ~/.ssh ] || (mkdir ~/.ssh; chmod 711 ~/.ssh) # �оздаем ди�ек�о�и� и да�м п�ава
+remote$ cat ~/id_rsa.pub >> ~/.ssh/authorized_keys        # добавл�ем о�к����й кл��
+remote$ chmod 600 ~/.ssh/authorized_keys                  # делаем п�авил�н�е п�ава 
+remote$ rm ~/id_rsa.pub                                   # �дал�ем не н�жное

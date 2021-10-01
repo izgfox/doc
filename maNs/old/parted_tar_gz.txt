@@ -1,0 +1,3 @@
+split -b 700m archive.tar part
+
+cat part* > archive.tar

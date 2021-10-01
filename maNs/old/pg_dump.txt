@@ -1,0 +1,20 @@
+ nohup su -c "pg_dump cpgu | gzip > /tmp/bk/test_cpgu.sql.gz" postgres &
+
+
+
+
+su -c "pg_dump -h 172.18.16.218 -Fc -o -U postgres cpgu | gzip > /backup/cpgu.sql.gz" postgres
+
+su -c "cat /tmp/test_cpgu.sql.gz | gunzip | psql cpgu_new" postgres
+
+
+
+мян
+
+pg_dump -h 192.168.133.146 -Fc -o -U adapters adaptersdb | gzip > /tmp/adaptersdb_nso_2015-07-27.sql.gz
+
+scp -r /tmp/2015-07-23  root@192.168.133.146:/tmp/
+S6EhrkKz94wabt
+ssh root@192.168.133.146
+S6EhrkKz94wabt
+su -c "cat /tmp/2015-07-23/postgres-10.sql | psql adaptersdb " postgres

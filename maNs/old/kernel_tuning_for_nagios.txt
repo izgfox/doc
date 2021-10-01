@@ -1,0 +1,2 @@
+$ echo 131072000 > /proc/sys/kernel/msgmax 
+$ echo 131072000 > /proc/sys/kernel/msgmnb

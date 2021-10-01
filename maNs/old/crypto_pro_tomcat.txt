@@ -1,0 +1,10 @@
+1)/var/CPROcsp/keys/tomcat = 700
+2) /var/CPROcsp/keys/tomcat/$any.000 = 755
+3) /var/CPROcsp/keys/tomcat/$any.000/* = 744
+
+
+/var/lib/tomcat6/webapps/popularization/WEB-INF/classes/app.properties
+
+
+sign.key=MAISToken
+sign.password=1234567890

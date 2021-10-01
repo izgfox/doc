@@ -1,0 +1,198 @@
+Настройка LXC-Контейнера для ограничения входящего и исходящего трафика.
+1) Настраиваем Хост систему для создания контейнера. За хостовую систему взята Slackware 14.1 с ядром Linux 3.10.17 :
+1.1) Настройка сети:
+root@lxc:~# nano /etc/rc.d/rc.inet1.conf
+# Config information for eth0:
+IPADDR[0]="192.168.0.150"
+NETMASK[0]="255.255.255.0"
+#USE_DHCP[0]=""
+#DHCP_HOSTNAME[0]=""
+# Default gateway IP address:
+GATEWAY="192.168.0.1"
+
+nano /etc/resolv.conf 
+nameserver 8.8.8.8
+
+1.2) Настраиваем интерфейс в режиме Bridge. Для этого записываем в /etc/rc.d/rc.local:
+
+ifconfig eth0 down
+brctl addbr br0 ##создаёт экземпляр логического коммутатора с именем br0
+brctl setfd br0 0 ###Задержка передачи (Forwarding delay)
+#Задержка передачи (forwarding delay) это время в течение которого порт находится в состояниях Listening и Learning, 
+#прежде чем перейти в состояние Forwarding. Это время нужно для того чтобы мост, 
+#когда он включается в сеть, прежде чем включаться в работу, сначала ознакомился с трафиком
+ifconfig br0 192.168.0.150 netmask 255.255.255.0 promisc up
+route add default gw 192.168.0.1
+brctl addif br0 eth0
+ifconfig eth0 0.0.0.0 up
+brctl addbr br1
+brctl setfd br1 0
+ifconfig br1 0.0.0.0 promisc up
+brctl addif br1 eth1
+ifconfig eth1 0.0.0.0 up
+
+Так же записываем в /etc/rc.d/rc.local модули, необходимые для firewall:
+modprobe ip_tables
+modprobe x_tables
+modprobe iptable-filter
+
+
+1.3) Перезапускаем хост:
+
+reboot
+
+1.4) После включения:
+
+root@lxc:~# ifconfig
+br0: flags=4419<UP,BROADCAST,RUNNING,PROMISC,MULTICAST>  mtu 1500
+        inet 192.168.0.150  netmask 255.255.255.0  broadcast 192.168.0.255
+        inet6 fe80::c871:75ff:fe25:a445  prefixlen 64  scopeid 0x20<link>
+        ether 08:00:27:d0:fa:d4  txqueuelen 0  (Ethernet)
+        RX packets 34  bytes 4082 (3.9 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 43  bytes 7179 (7.0 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet6 fe80::a00:27ff:fed0:fad4  prefixlen 64  scopeid 0x20<link>
+        ether 08:00:27:d0:fa:d4  txqueuelen 1000  (Ethernet)
+        RX packets 49  bytes 5548 (5.4 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 62  bytes 8389 (8.1 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+        device interrupt 10  base 0xd020
+
+		
+2) Создание lxc-контейнера:
+2.1) в директорию /usr/share/lxc/templates помещаем шаблон lxc-slackware (на основе этого шаблона делаем контейнер).
+2.2) Открываем шаблон любым редактором:
+
+nano /usr/share/lxc/templates/lxc-slackware
+
+Изменяем первые строки шаблона:
+
+SUITE=${SUITE:-13.37} #указываем версию дистрибутива
+cache=${cache:-/var/cache/lxc/slackware}
+# let's use a secondary mirror to avoid loading the primary
+#MIRROR=${MIRROR:-http://www.slackware.at/data}
+MIRROR=${MIRROR:-http://192.168.154.250} #указываем нашего зеркало для дистрибутива, по этому адресу лежит стабильная версия ОС.
+
+2.3) Выдаём права на исполнение шаблона lxc:
+chmod 755 /usr/share/lxc/templates/lxc-slackware
+
+2.4) Создаём контейнер:
+
+root@lxc:~# lxc-create -n GW -t slackware
+
+После создания контейнера, настраиваем его сетевую конфигурацию:
+
+nano /var/lib/lxc/GW/config
+
+lxc.network.type = veth
+lxc.network.link = br0
+lxc.network.flags = up
+lxc.network.ipv4 = 192.168.0.151/24
+lxc.network.hwaddr = 60:aa:06:bb:51:cc
+lxc.network.name = eth0
+
+
+lxc.network.type = veth
+lxc.network.link = br1
+lxc.network.flags = up
+lxc.network.ipv4 = 192.168.0.152/24
+lxc.network.hwaddr = 00:aa:95:bb:52:cc
+lxc.network.name = eth1
+
+
+nano /var/lib/lxc/GW/rootfs/etc/rc.d/rc.inet1.conf
+
+# Config information for eth0:
+IPADDR[0]="192.168.0.151"
+NETMASK[0]="255.255.255.0"
+HWADDR[0]="60:aa:06:4b:51:cc"
+USE_DHCP[0]=""
+DHCP_HOSTNAME[0]=""
+
+# Config information for eth1:
+IPADDR[1]="192.168.0.152"
+NETMASK[1]="255.255.255.0"
+HWADDR[1]="00:aa:95:bb:52:cc"
+USE_DHCP[1]=""
+DHCP_HOSTNAME[1]=""
+
+# Config information for eth2:
+IPADDR[2]=""
+NETMASK[2]=""
+USE_DHCP[2]=""
+DHCP_HOSTNAME[2]=""
+
+# Config information for eth3:
+IPADDR[3]=""
+NETMASK[3]=""
+USE_DHCP[3]=""
+DHCP_HOSTNAME[3]=""
+
+# Default gateway IP address:
+GATEWAY[1]="192.168.0.1"
+
+
+2.5) На хостовой машине выполняем набор команд по монтированию директорий:
+mount --bind /usr/lib64/ /var/lib/lxc/GW/rootfs/usr/lib64/
+mount --bind /lib64/ /var/lib/lxc/GW/rootfs/lib64/
+mount --bind /usr/bin/ /var/lib/lxc/GW/rootfs/usr/bin/
+mount --bind /usr/sbin/ /var/lib/lxc/GW/rootfs/usr/sbin/
+mount --bind /usr/local/ /var/lib/lxc/GW/rootfs/usr/local/
+mount --bind /sbin/ /var/lib/lxc/GW/rootfs/sbin/
+mount --bind /bin/ /var/lib/lxc/GW/rootfs/bin/
+
+После настройки сетевой конфигурации контейнера, запускаем его:
+root@lxc:~# lxc-start -d -n GW
+
+Подключаемся к контейнеру:
+root@lxc:~# lxc-console -n GW
+
+2.5) Настраиваем ограничение транзитного трафика через контейнер GW.
+Ограничение трафика настраиваем с помощью утилиты tc, для этого необходимо на каждый сетевой интерфейс (у нас их два)
+добавить нижеизложенные правила:
+
+nano /etc/rc.d/rc.local
+
+/etc/rc.d/rc.inet1 restart
+
+###Создаём правило MASQUERADE для firewall таблицы nat цепочки POSTROUTING,
+###которое позволяет нам подменить адрес источника.
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE 
+###Разрешаем транзитный трафик
+iptables -P FORWARD ACCEPT
+echo 1 > /proc/sys/net/ipv4/ip_forward 
+
+##задаём корневую дисциплину, handle 1 - дестриптор дисциплины,
+#default 30-класс по умолчанию
+tc qdisc add dev eth0 root handle 1: htb default 30 
+##задаём класс дисциплины, classid 1:3- идентификатор класса
+##rate 1mbit - порог пропускной способности 
+tc class add dev eth0 parent 1:0 classid 1:3 htb rate 1mbit 
+##задаём фильтр, в котором указываем:
+##через какой класс будет проходить трафик и какой протокол будет использоваться.
+tc filter add dev eth0 parent 1: protocol ip prio 20 basic classid 1:3 
+
+##Для интерфейса eth1 делаем аналогичные настройки
+tc qdisc add dev eth1 root handle 2: htb default 30
+tc class add dev eth1 parent 2:0 classid 2:3 htb rate 1mbit
+tc filter add dev eth1 parent 2: protocol ip prio 20 basic classid 2:3
+
+
+###Создаём маршруты ИМЕННО через интерфейс eth0, для того,чтобы бы сработал максардинг firewall
+route add default gw 192.168.0.1 dev eth0
+route add -net 192.168.120.0 netmask 255.255.255.0 gw 192.168.154.253 dev eth0
+route add -net 192.168.155.0 netmask 255.255.255.0 gw 192.168.154.253 dev eth0
+ 
+ 
+##Совокупность настроек маршрутов, firewall и tc, даёт нам возможность ограничить скорость GW как на download upload
+2.6) Перезапуск контейнера, выполнить с хостовой системы:
+lxc-stop -n GW
+lxc-start -d -b GW
+
+3) Проверить ограничение трафика можно следующим образом:
+3.1) настроить на любом из компьютеров шлюзом по умолчанию наш контейнер и запустить на компьютере проверку скорости, например speedtest.net.
+3.2) на контейнере GW с помощью утилит vnstat и iftop измеряем скорость транзитного трафика (скорость будет ограничена в соответствии с параметром rate 1mbit )

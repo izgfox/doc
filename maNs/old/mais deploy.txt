@@ -1,0 +1,79 @@
+﻿Deploy Маис
+1) scp -P 22151 /home/samba/serviceorder-portlet-0.0.1.465-DECOMPILED-SNAPSHOT.war root@81.1.205.10:
+2) ssh root@81.1.205.10 -p 22151
+3)  mv serviceorder-portlet-0.0.1.465-DECOMPILED-SNAPSHOT.war serviceorder-portlet.war
+4) cd /root/deploy_scripts/
+5) ./deploy.sh
+если нет на шаге остановки то
+Идем в другую консоль
+ps aux | grep mais
+kill
+
+проверяем
+http://dev.mais.nso.ru/
+http://dev.mais.nso.ru/serviceorder-portlet/ws/smev-server/smev33.wsdl
+http://dev.mais.nso.ru/serviceorder-portlet/ws/smev-server/smev.wsdl
+
+на проде без dev
+
+деплой прода маис
+если есть файл mais.sso то его нужно положить на проде :: 
+(scp -P 22164 /home/samba/mais-sso.war root@81.1.205.10:)
+
+
+
+1) scp -P 22164 /home/samba/serviceorder-portlet-0.0.1.465-DECOMPILED-SNAPSHOT.war root@81.1.205.10:
+2) ssh root@81.1.205.10 -p 22164
+
+pid=`ps -ef | grep monit`
+kill -9 $pid
+
+maispid=`ps -ef | grep mais`
+kill -9 $maispid
+
+
+4) mkdir -p /root/backup/mais06112015
+5) tar cvfz /root/backup/mais06112015/lucene.tar.gz /opt/liferay/data/lucene/
+6) nohup mysqldump -h192.168.133.167 -umais_user -p8hjsh7iuGHsfh2782aGHAks2 maisdb | gzip > /root/backup/mais06112015/mais.sql.gz &
+7) rm -rf /home/lportal/liferay/tomcat-7.0.23/webapps/serviceorder-portlet/
+8) rm -rf /home/lportal/liferay/tomcat-7.0.23/work/Catalina/localhost/serviceorder-portlet/
+9) mv /root/serviceorder-portlet-0.0.1.465-DECOMPILED-SNAPSHOT.war /root/serviceorder-portlet.war
+10) cat /dev/null > /opt/liferay/tomcat-7.0.23/logs/catalina.out
+
+mv /root/mais-sso.war /home/lportal/liferay/deploy/
+
+11)  cp -v /root/serviceorder-portlet.war /home/lportal/liferay/deploy/
+
+chown mais:mais /home/lportal/liferay/deploy/mais-sso.war
+
+chown mais:mais /home/lportal/liferay/deploy/serviceorder-portlet.war
+
+#12) sudo -u mais /home/lportal/liferay/tomcat-7.0.23/bin/catalina.sh start
+
+mv /opt/liferay/tomcat-7.0.23/logs/catalina.out /opt/liferay/tomcat-7.0.23/logs/catalina.out.2014-12-12.bak
+
+touch /opt/liferay/tomcat-7.0.23/logs/catalina.out
+
+chown mais:mais /opt/liferay/tomcat-7.0.23/logs/catalina.out
+
+
+13) monit
+
+
+##################### monit #########################################################
+check process tomcat with pidfile "/var/run/tomcat/tomcat.pid"
+start program = "/usr/local/tomcat/bin/startup.sh"
+as uid tomcat gid tomcat
+stop program = "/usr/local/tomcat/bin/shutdown.sh"
+as uid tomcat gid tomcat
+if failed port 8080 then alert
+if failed port 8080 for 5 cycles then restart
+Then edit your catalina.sh and set
+
+CATALINA_PID to be /var/run/tomcat/tomcat.pid
+JAVA_HOME=/usr/java/jdk
+
+
+ check process mais with pidfile /var/run/mais/mais.pid
+ start program = "/home/lportal/liferay/tomcat-7.0.23/bin/startup.sh" as uid mais and gid mais
+ stop program  = "/home/lportal/liferay/tomcat-7.0.23/bin/shutdown.sh" as uid mais and gid mais

@@ -1,0 +1,23 @@
+-A INPUT -s 192.168.99.91/32 -m state --state NEW -p tcp --dport 5666 -j ACCEPT
+
+
+
+
+spring.datasource.username=atcfs spring.datasource.password=hGy2jh7378ShlcnjdS2
+
+
+/opt/orientdb/bin/orientdb.sh start sleep 60 /etc/init.d/tomcat7 start
+
+
+195.46.122.52:7022
+195.46.122.52:9022
+
+огин: root
+пароль: 6.November1
+
+ln -s /usr/lib64/libssl.so.1.0.1e /usr/lib64/libssl.so.6
+ln -s /usr/lib64/libcrypto.so.1.0.1e /usr/lib64/libcrypto.so.6
+
+admin zic2014 su smev2014
+
+(!objectclass=computer)

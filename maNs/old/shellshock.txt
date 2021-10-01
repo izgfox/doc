@@ -1,0 +1,18 @@
+env x='() { :;}; echo vulnerable' bash -c 'echo hello'
+
+ yum upgrade bash tzdata
+
+
+mcedit /etc/apt/sources.list
+
+deb http://http.debian.net/debian/ squeeze main contrib non-free
+deb-src http://http.debian.net/debian/ squeeze main contrib non-free
+deb http://security.debian.org/ squeeze/updates main contrib non-free
+deb-src http://security.debian.org/ squeeze/updates main contrib non-free
+deb http://http.debian.net/debian squeeze-lts main contrib non-free
+deb-src http://http.debian.net/debian squeeze-lts main contrib non-free
+
+apt-get update && apt-get install --only-upgrade bash tzdata
+ date --set="2 OCT 2006 18:00:00"
+
+e1iSSx97R9V2Fo

@@ -1,0 +1,22 @@
+CPU_LOAD
+/nagios/libexec/check_nt -H 192.168.154.194 -v CPULOAD -l 1,80,95,5,80,95,15,80,95 -s briv31so2 -p 12489
+UPTIME
+/nagios/libexec/check_nt -H 192.168.154.194 -v UPTIME  -s briv31so2 -p 12489
+MEMUSE
+/nagios/libexec/check_nt -H 192.168.154.194 -v MEMUSE  -s briv31so2 -p 12489
+Service is run
+/nagios/libexec/check_nt -H 192.168.154.194 -v SERVICESTATE -l Dnscache  -s briv31so2 -p 12489
+proc is running
+/nagios/libexec/check_nt -H 192.168.154.194 -v PROCSTATE -l iexplore.exe  -s briv31so2 -p 12489
+
+tx
+ /opt/node/nagios/libexec/check_nt -H 192.168.154.194 -v COUNTER -l "\\\WIN-OTP2951OB5T\\Сетевой интерфейс(*)\\Отправлено байт/с"  -s briv31so2 -p 12489
+rx
+/opt/node/nagios/libexec/check_nt -H 192.168.154.194 -v COUNTER -l "\\\WIN-OTP2951OB5T\\Сетевой интерфейс(*)\\Получено байт/с"  -s briv31so2 -p 12489
+
+диск свободно в мегабайт
+/opt/node/nagios/libexec/check_nt -H 192.168.154.194 -v COUNTER -l "\\\WIN-OTP2951OB5T\\Логический диск(C:)\\Свободно мегабайт"  -s briv31so2 -p 12489
+диск свободно процент
+/opt/node/nagios/libexec/check_nt -H 192.168.154.194 -v COUNTER -l "\\\WIN-OTP2951OB5T\\Логический диск(C:)\\% свободного места"  -s briv31so2 -p 12489
+Процент потребления процессора процессом
+/opt/node/nagios/libexec/check_nt -H 192.168.154.44 -v COUNTER -l "\\\ATC-NSK5000\\Процесс(java)\\% загруженности процессора"  -s briv31so2 -p 12489

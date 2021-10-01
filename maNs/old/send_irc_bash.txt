@@ -1,0 +1,1 @@
+echo -e 'ololo trololo\nNICK NAGIOS\nJOIN #NAGIOS\nPRIVMSG #NAGIOS :Briv31So2\nQUIT\n' \ | nc 127.0.0.1 6667 
