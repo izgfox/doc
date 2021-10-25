@@ -1,0 +1,15 @@
+1) Backup
+### check xfs
+xfs_repair -n /dev/mapper/vgPool-kvm
+xfsdump -l 0 -f ./xfsKvm.image /dev/mapper/vgPool-kvm
+
+umount /dev/mapper/vgPool-kvm
+
+lvremove /dev/mapper/vgPool-kvm
+
+lvcreate -i 2 -I 64 -l 40%VG  -n xfsLargeFilesFastArray vgPool
+mkfs.xfs /dev/mapper/vgPool-xfsLargeFilesFastArray 
+mount /dev/vgPool/xfsLargeFilesFastArray /mnt/kvm
+### mcedit /etc/fstab
+
+

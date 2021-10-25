@@ -1,0 +1,1235 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "API: База нежелательных клиентов",
+    "version": "1.0.2"
+  },
+  "externalDocs": {
+    "description": "Описание версии",
+    "url": "http://bnk.dev-ithost.expobank.org/version"
+  },
+  "servers": [
+    {
+      "url": "http://bnk.dev-ithost.expobank.org",
+      "description": "HTTP"
+    },
+    {
+      "url": "https://bnk.dev-ithost.expobank.org",
+      "description": "HTTPS"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Documents",
+      "description": "Документы"
+    },
+    {
+      "name": "Contacts",
+      "description": "Контакты"
+    },
+    {
+      "name": "Addresses",
+      "description": "Адреса (в том числе гео данные)"
+    },
+    {
+      "name": "Persons",
+      "description": "ФИО и даты рождения"
+    },
+    {
+      "name": "Jobs",
+      "description": "Работодатели"
+    }
+  ],
+  "paths": {
+    "/black_list_document": {
+      "post": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Добавить документ в лист",
+        "description": "Post Document object",
+        "requestBody": {
+          "description": "New Document",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Black_list_document"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Black_list_document"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parameters fail",
+            "content": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/black_list_document/document_type={document_type}&document_number={document_number}": {
+      "get": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Поиск документа по типу и номеру",
+        "description": "Document search",
+        "parameters": [
+          {
+            "name": "document_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "document_number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Black_list_document"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Client error and Bad Request",
+            "content": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/black_list_documents/import/csv/action={action}": {
+      "get": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Выполнить действие",
+        "description": "actions: list | example | daily | custom",
+        "parameters": [
+          {
+            "name": "action",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Client error and Bad Request",
+            "content": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/black_list_documents/upload/csv": {
+      "post": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "предварительная загрузка файлов для импорта",
+        "description": "file names: example.csv | custom.csv | YYYY-mm-dd.csv",
+
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fileName": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "petstore_auth": [
+              "write:pets",
+              "read:pets"
+            ]
+          }
+        ]
+      }
+    },
+
+    "/black_list_contact": {
+      "post": {
+        "tags": [
+          "Contacts"
+        ],
+        "summary": "Добавить контакт в лист",
+        "description": "Post Contact object",
+        "operationId": "postContact",
+        "requestBody": {
+          "description": "New Contact",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Black_list_contact"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Black_list_contact"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parameters fail",
+            "content": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/black_list_contact/contact_type={contact_type}&contact_number={contact_number}": {
+      "get": {
+        "tags": [
+          "Contacts"
+        ],
+        "summary": "Поиск контакта по типу и номеру",
+        "description": "contact search",
+        "parameters": [
+          {
+            "name": "contact_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "contact_number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Black_list_contact"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Client error and Bad Request",
+            "content": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/black_list_contacts/import/csv/action={action}": {
+      "get": {
+        "tags": [
+          "Contacts"
+        ],
+        "summary": "Выполнить действие",
+        "description": "actions: list | example | daily | custom",
+        "parameters": [
+          {
+            "name": "action",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Client error and Bad Request",
+            "content": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/black_list_contacts/upload/csv": {
+      "post": {
+        "tags": [
+          "Contacts"
+        ],
+        "summary": "Преварительная загрузка файлов для импорта",
+        "description": "file names: example.csv | custom.csv | YYYY-mm-dd.csv",
+
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fileName": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "petstore_auth": [
+              "write:pets",
+              "read:pets"
+            ]
+          }
+        ]
+      }
+    },
+
+    "/black_list_address": {
+      "post": {
+        "tags": [
+          "Addresses"
+        ],
+        "summary": "Добавить адрес в лист",
+        "description": "Post Address object",
+        "requestBody": {
+          "description": "New Address",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Black_list_address"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Black_list_address"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parameters fail",
+            "content": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/black_list_address/region={region}&living_type={living_type}&living_name={living_name}&living_house={living_house}": {
+      "get": {
+        "tags": [
+          "Addresses"
+        ],
+        "summary": "Поиск по фильтрам:",
+        "description": "\n## Полное совпадение\n### Регион\n* region\n### Тип населенного пункта\n* living_type\n### Название населенного пункта\n* living_name\n### Дом\n* living_house",
+
+        "parameters": [
+          {
+            "name": "region",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "living_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "living_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "living_house",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Black_list_address"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Client error and Bad Request",
+            "content": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/black_list_addresses/import/csv/action={action}": {
+      "get": {
+        "tags": [
+          "Addresses"
+        ],
+        "summary": "Выполнить действие",
+        "description": "actions: list | example | daily | custom",
+        "parameters": [
+          {
+            "name": "action",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Client error and Bad Request",
+            "content": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/black_list_addresses/upload/csv": {
+      "post": {
+        "tags": [
+          "Addresses"
+        ],
+        "summary": "Преварительная загрузка файлов для импорта",
+        "description": "file names: example.csv | custom.csv | YYYY-mm-dd.csv",
+
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fileName": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "petstore_auth": [
+              "write:pets",
+              "read:pets"
+            ]
+          }
+        ]
+      }
+    },
+
+    "/black_list_person": {
+      "post": {
+        "tags": [
+          "Persons"
+        ],
+        "summary": "Добавить персону в лист",
+        "description": "Post Persons object",
+        "requestBody": {
+          "description": "New Persons",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Black_list_person"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Black_list_person"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parameters fail",
+            "content": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/black_list_person/first_name={first_name}&last_name={last_name}&middle_name={middle_name}&date_of_birth={date_of_birth}": {
+      "get": {
+        "tags": [
+          "Persons"
+        ],
+        "summary": "Поиск по фильтрам:",
+        "description": "\n## Полное совпадение\n### Имя\n* first_name\n### Фамилия\n* last_name\n### Отчество\n* middle_name\n### Дата рождения\n* date_of_birth",
+
+        "parameters": [
+          {
+            "name": "first_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "last_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "middle_name",
+            "in": "path",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "date_of_birth",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Black_list_person"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Client error and Bad Request",
+            "content": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/black_list_persons/import/csv/action={action}": {
+      "get": {
+        "tags": [
+          "Persons"
+        ],
+        "summary": "Выполнить действие",
+        "description": "actions: list | example | daily | custom",
+        "parameters": [
+          {
+            "name": "action",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Client error and Bad Request",
+            "content": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/black_list_persons/upload/csv": {
+      "post": {
+        "tags": [
+          "Persons"
+        ],
+        "summary": "Преварительная загрузка файлов для импорта",
+        "description": "file names: example.csv | custom.csv | YYYY-mm-dd.csv",
+
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fileName": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "petstore_auth": [
+              "write:pets",
+              "read:pets"
+            ]
+          }
+        ]
+      }
+    },
+
+    "/black_list_job": {
+      "post": {
+        "tags": [
+          "Jobs"
+        ],
+        "summary": "Добавить работодателя в лист",
+        "description": "Post Jobs object",
+        "requestBody": {
+          "description": "New Jobs",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Black_list_job"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Black_list_job"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parameters fail",
+            "content": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/black_list_job/inn={inn}": {
+      "get": {
+        "tags": [
+          "Jobs"
+        ],
+        "summary": "Поиск по фильтрам:",
+        "description": "\n## Полное совпадение\n### ИНН организации\n* inn\n",
+
+        "parameters": [
+          {
+            "name": "inn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Black_list_job"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Client error and Bad Request",
+            "content": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/black_list_jobs/import/csv/action={action}": {
+      "get": {
+        "tags": [
+          "Jobs"
+        ],
+        "summary": "Выполнить действие",
+        "description": "actions: list | example | daily | custom",
+        "parameters": [
+          {
+            "name": "action",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Client error and Bad Request",
+            "content": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/black_list_jobs/upload/csv": {
+      "post": {
+        "tags": [
+          "Jobs"
+        ],
+        "summary": "Преварительная загрузка файлов для импорта",
+        "description": "file names: example.csv | custom.csv | YYYY-mm-dd.csv",
+
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fileName": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "petstore_auth": [
+              "write:pets",
+              "read:pets"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Black_list_document": {
+        "required": [
+          "document_number",
+          "document_type_id"
+        ],
+        "type": "object",
+        "properties": {
+          "document_number": {
+            "type": "string",
+            "description": "varchar(255)",
+            "example": "5005999618"
+          },
+          "document_type_id": {
+            "type": "integer",
+            "description": "int(11)",
+            "example": "127"
+          },
+          "risk_group": {
+            "type": "number",
+            "description": "int(11)",
+            "example": "1"
+          },
+          "source": {
+            "type": "string",
+            "description": "varchar(255)",
+            "example": "Авто Экспресс"
+          },
+          "inserted_reason": {
+            "type": "string",
+            "description": "varchar(255)",
+            "example": "daily"
+          },
+          "record_expiration_date": {
+            "type": "string",
+            "description": "datetime",
+            "example": "2021-12-31 23:59:59"
+          },
+          "initiator_system_id": {
+            "type": "number",
+            "description": "int(11)",
+            "example": "127"
+          },
+          "initiator_system_request_id": {
+            "type": "number",
+            "description": "bigint(20)",
+            "example": "99999999999999"
+          }
+        },
+        "description": "Документы"
+      },
+      "Black_list_contact": {
+        "required": [
+          "contact_number",
+          "contact_type_id"
+        ],
+        "type": "object",
+        "properties": {
+          "contact_number": {
+            "type": "string",
+            "description": "varchar(255)",
+            "example": "+7(923)232-70-80"
+          },
+          "contact_type_id": {
+            "type": "integer",
+            "description": "int(11)",
+            "example": "127"
+          },
+          "risk_group": {
+            "type": "number",
+            "description": "int(11)",
+            "example": "127"
+          },
+          "source": {
+            "type": "string",
+            "description": "varchar(255)",
+            "example": "Фабрика"
+          },
+          "inserted_reason": {
+            "type": "string",
+            "description": "varchar(255)",
+            "example": "custom"
+          },
+          "record_expiration_date": {
+            "type": "string",
+            "description": "2021-12-21 23:59:59"
+          },
+          "initiator_system_id": {
+            "type": "number",
+            "description": "int(11)",
+            "example": "127"
+          },
+          "initiator_system_request_id": {
+            "type": "number",
+            "description": "bigint(20)",
+            "example": "99999999999999"
+          }
+        },
+        "description": "Контакты"
+      },
+      "Black_list_address": {
+        "required": [
+          "region",
+          "living_type",
+          "living_name",
+          "living_house"
+        ],
+        "type": "object",
+        "properties": {
+          "address_type": {
+            "type": "string",
+            "description": "varchar(255)",
+            "example": "Адрес проживания"
+          },
+          "region": {
+            "type": "string",
+            "description": "varchar(255)",
+            "example": "Москва"
+          },
+          "living_type": {
+            "type": "string",
+            "description": "varchar(255)",
+            "example": "Частный"
+          },
+          "living_name": {
+            "type": "string",
+            "description": "varchar(255)",
+            "example": "Дом"
+          },
+          "living_street": {
+            "type": "string",
+            "description": "varchar(255)",
+            "example": "Ленина"
+          },
+          "living_house": {
+            "type": "string",
+            "description": "varchar(255)",
+            "example": "8"
+          },
+          "living_lat": {
+            "type": "number",
+            "description": "decimal(10,8)",
+            "example": 35.929673
+          },
+          "living_lon": {
+            "type": "number",
+            "description": "decimal(11,8)",
+            "example": -78.948237
+          },
+          "risk_group": {
+            "type": "number",
+            "description": "int(11)",
+            "example": "127"
+          },
+          "source": {
+            "type": "string",
+            "description": "varchar(255)",
+            "example": "СПР FIS"
+          },
+          "inserted_reason": {
+            "type": "string",
+            "description": "varchar(255)",
+            "example": "hourly"
+          },
+          "record_expiration_date": {
+            "type": "string",
+            "description": "datetime",
+            "example": "2021-12-31 23:59:59"
+          },
+          "initiator_system_id": {
+            "type": "number",
+            "description": "int(11)",
+            "example": "127"
+          },
+          "initiator_system_request_id": {
+            "type": "number",
+            "description": "bigint(20)",
+            "example": "99999999999999"
+          }
+        },
+        "description": "Адреса"
+      },
+      "Black_list_person": {
+        "required": [
+          "first_name",
+          "last_name",
+          "middle_name",
+          "date_of_birth"
+        ],
+        "type": "object",
+        "properties": {
+          "first_name": {
+            "type": "string",
+            "description": "varchar(255)"
+          },
+          "last_name": {
+            "type": "string",
+            "description": "varchar(255)"
+          },
+          "middle_name": {
+            "type": "string",
+            "description": "varchar(255)"
+          },
+          "full_name": {
+            "type": "string",
+            "description": "varchar(255)"
+          },
+          "date_of_birth": {
+            "type": "string",
+            "description": "date"
+          },
+          "gender_id": {
+            "type": "number",
+            "description": "int(11)"
+          },
+          "risk_group": {
+            "type": "number",
+            "description": "int(11)"
+          },
+          "source": {
+            "type": "string",
+            "description": "varchar(255)"
+          },
+          "inserted_reason": {
+            "type": "string",
+            "description": "varchar(255)"
+          },
+          "record_expiration_date": {
+            "type": "string",
+            "description": "datetime"
+          },
+          "initiator_system_id": {
+            "type": "number",
+            "description": "int(11)"
+          },
+          "initiator_system_request_id": {
+            "type": "number",
+            "description": "bigint(20)"
+          }
+        },
+        "description": "Личности"
+      },
+      "Black_list_job": {
+        "required": [
+          "inn"
+        ],
+        "type": "object",
+        "properties": {
+          "region": {
+            "type": "string",
+            "description": "varchar(255)"
+          },
+          "short_name": {
+            "type": "string",
+            "description": "varchar(255)"
+          },
+          "full_name": {
+            "type": "string",
+            "description": "varchar(255)"
+          },
+          "owner_type": {
+            "type": "string",
+            "description": "varchar(255)"
+          },
+          "inn": {
+            "type": "string",
+            "description": "varchar(255)"
+          },
+          "risk_group": {
+            "type": "number",
+            "description": "int(11)"
+          },
+          "source": {
+            "type": "string",
+            "description": "varchar(255)"
+          },
+          "inserted_reason": {
+            "type": "string",
+            "description": "varchar(255)"
+          },
+          "record_expiration_date": {
+            "type": "string",
+            "description": "datetime"
+          },
+          "initiator_system_id": {
+            "type": "number",
+            "description": "int(11)"
+          },
+          "initiator_system_request_id": {
+            "type": "number",
+            "description": "bigint(20)"
+          }
+        },
+        "description": "Работодатели"
+      }
+    }
+  }
+}

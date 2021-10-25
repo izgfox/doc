@@ -1,0 +1,3 @@
+```
+npx webpack serve --config ./webpack.config.js --allowed-hosts all
+```

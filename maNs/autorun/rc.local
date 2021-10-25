@@ -1,0 +1,66 @@
+#!/bin/bash
+#
+# /etc/rc.d/rc.local:  Local system initialization script.
+#
+# Put any local startup commands in here.  Also, if you have
+# anything that needs to be run at shutdown time you can
+# make an /etc/rc.d/rc.local_shutdown script and put those
+# commands in there.
+echo "9223372036854775807" > /proc/sys/kernel/shmmax
+ifconfig eth0 down
+ifconfig eth0 0.0.0.0 up
+
+brctl addbr br0
+brctl setfd br0 0
+
+ifconfig br0 10.10.20.1 netmask 255.255.255.0 promisc up
+
+/usr/sbin/openvpn --mktun --dev tap0 --user `id -un`
+/usr/sbin/openvpn --mktun --dev tap1 --user `id -un`
+#/usr/sbin/openvpn --mktun --dev tap2 --user `id -un`
+#/usr/sbin/openvpn --mktun --dev tap3 --user `id -un`
+
+brctl addif br0 eth0
+brctl addif br0 tap0
+brctl addif br0 tap1
+#brctl addif br0 tap2
+#brctl addif br0 tap3
+ifconfig br0 up
+ifconfig tap0 up
+ifconfig tap1 up
+
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+
+
+ifconfig wlan0 0.0.0.0 down
+ifconfig wlan0 up
+#iwlist wlan0 scanning | grep ESSID > /tmp/ESSIDS
+#cat /tmp/ESSIDS
+rm -rf /var/run/wpa_supplicant/wlan0
+
+su - root -c "/usr/bin/screen -dmS wiFi bash -c 'wpa_supplicant -Dnl80211 -i wlan0 -c /etc/wpa_supplicant.conf; exec bash'"
+
+dhclient wlan0 &
+
+# enable ipv4 forwarding
+echo "1" > /proc/sys/net/ipv4/ip_forward
+ 
+# netfilter cleanup
+iptables --flush
+iptables -t nat -F
+iptables -X
+iptables -Z
+iptables -P INPUT ACCEPT
+iptables -P OUTPUT ACCEPT
+iptables -P FORWARD ACCEPT
+
+#su - root -c "/usr/bin/screen -dmS pgsql12 bash -c 'cd /mnt/kvm/pg12 && ./pg12.sh; exec bash'"
+nginx
+# netfilter network address translation
+iptables -t nat -A POSTROUTING -s 10.10.20.0/24 -j MASQUERADE
+
+#su - root -c "/usr/bin/screen -dmS win10 bash -c 'cd /mnt/kvm/win10 && ./windows10.sh; exec sh; exec bash'"
+
+#chmod +x /etc/rc.d/rc.mysqld && /etc/rc.d/rc.mysqld start
+#chmod -x /etc/rc.d/rc.mysqld
+ifconfig br0:1 10.10.20.20 up

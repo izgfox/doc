@@ -1,0 +1,7 @@
+create 2 disks with 30 type Linux LVM
+vgcreate vgPool /dev/nvme0n1p4 /dev/nvme1n1p4
+lvcreate -i 2 -I 64 -l 50%VG  -n kvm vgPool
+lvcreate -i 2 -I 4 -L 10000  -n home vgPool
+vgscan
+pvscan
+lvscan
