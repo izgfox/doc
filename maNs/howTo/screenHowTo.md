@@ -1,4 +1,4 @@
-### пользователь root
+### Пользователь root
 ```
 chmod u+s /usr/bin/screen
 chmod 755 /var/run/screen
