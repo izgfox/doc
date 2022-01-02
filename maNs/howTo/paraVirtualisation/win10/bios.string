@@ -1,0 +1,1 @@
+-bios /storage/install/newest/qemu/build/pc-bios/bios.bin -vga none \

@@ -1,0 +1,106 @@
+#!/bin/sh
+#
+# /etc/rc.d/rc.local:  Local system initialization script.
+#
+# Put any local startup commands in here.  Also, if you have
+# anything that needs to be run at shutdown time you can
+# make an /etc/rc.d/rc.local_shutdown script and put those
+# commands in there.
+echo "9223372036854775807" > /proc/sys/kernel/shmmax
+
+mount /dev/sdb3 /storage
+mount /dev/sda3 /storage2
+
+
+ifconfig eth0 down
+ifconfig eth0 0.0.0.0 up
+
+brctl addbr br0
+brctl setfd br0 0
+
+ifconfig br0 192.168.0.100 netmask 255.255.255.0 promisc up
+
+/usr/sbin/openvpn --mktun --dev tap0 --user `id -un`
+/usr/sbin/openvpn --mktun --dev tap1 --user `id -un`
+/usr/sbin/openvpn --mktun --dev tap2 --user `id -un`
+/usr/sbin/openvpn --mktun --dev tap3 --user `id -un`
+
+brctl addif br0 eth0
+brctl addif br0 tap0
+brctl addif br0 tap1
+brctl addif br0 tap2
+brctl addif br0 tap3
+ifconfig tap0 up
+ifconfig tap1 up
+ifconfig tap2 up
+ifconfig tap3 up
+
+route add default gateway 192.168.0.254
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+
+#mkdir -p /dialer/v4/ramfs/0_30/active
+#mount -t ramfs -o size=200m ramfs /dialer/v4/ramfs/0_30/active
+#chmod -R 777 /dialer/v4/
+
+mkdir -p /game/ramfs
+mount -t ramfs -o size=200m ramfs /game/ramfs/
+chmod -R 777 /game/ramfs/
+
+#/apache/bin/apachectl start
+
+# echo "9232324040" > /dialer/v4/ramfs/0_30/active/0010
+#spicec -h 192.168.154.180 -p 5900
+#mount -o nolock -t nfs 192.168.120.155:/raid1/nso/opt/052 /tmp/www/
+
+#/firewall
+
+#rtpengine -t 0 -i pub/37.195.213.19 --listen-ng=127.0.0.1:6666 --listen-cli=127.0.0.1:7777 --port-min=50000 --port-max=55000 --log-level=7 --pidfile=/var/run/rtpengine.pid --no-fallback --log-facility=local1
+
+#echo "cd /opt/MonitorSoftware && ./agent start && ./monitor"
+#startx
+
+#0) kvm
+screen -S kvm -dm bash -c 'cd /storage/kvm/dns/ && ./dns.sh; exec sh'
+
+#1) influxdb
+#screen -S influxdb -dm bash -c 'influxd; exec sh'
+
+#2) rabbit: /storage/install/rabbitmq_server-3.7.7/sbin/rabbitmq-server
+#screen -S rabbit -dm bash -c '/storage/install/rabbitmq_server-3.7.7/sbin/rabbitmq-server; exec sh'
+
+#3) node
+#screen -S node -dm bash -c 'cd /storage/node && node app.js; exec sh'
+
+#4) telegraf
+#screen -S telegraf -dm bash -c 'telegraf; exec sh'
+
+#5) chronograf
+#screen -S chronograf -dm bash -c 'chronograf --port=9999; exec sh'
+
+#6) grafana: cd /storage/install/grafana/grafana-4.6.3/bin/ && grafana-server
+#screen -S grafana -dm bash -c 'cd /storage/install/grafana/grafana-4.6.3/bin/ && grafana-server; exec sh'
+
+#7) windows 7 with phpstorm
+screen -S win7 -dm bash -c 'cd /storage/kvm/win7/ && ./w7new.sh; exec sh'
+#8) centos7 with postgresql 12.4
+screen -S centos7PG -dm bash -c 'cd /storage/kvm/pg/ && ./centos7.sh; exec sh'
+#last) nginx
+nginx
+
+
+#iommu
+#echo "9223372036854775807" > /proc/sys/kernel/shmmax
+###########################################################################
+#modprobe vfio
+#modprobe vfio_iommu_type1
+#modprobe vfio_pci
+#modprobe vfio_virqfd
+#modprobe vhost-net
+
+#echo "1002 aab0" > /sys/bus/pci/drivers/vfio-pci/new_id
+#echo "0000:02:00.1" > /sys/bus/pci/devices/0000\:02\:00.1/driver/unbind
+#echo "0000:02:00.1" > /sys/bus/pci/drivers/vfio-pci/bind
+#echo "1002 6818" > /sys/bus/pci/drivers/vfio-pci/new_id
+#echo "0000:02:00.0" > /sys/bus/pci/devices/0000\:02\:00.0/driver/unbind
+#echo "0000:02:00.0" > /sys/bus/pci/drivers/vfio-pci/bind
+
