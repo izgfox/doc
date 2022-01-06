@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+### decorator
+decor(){
+  printf "%s%s ---- $1 -----\r\n"
+  printf "%s%s    * $2 *    \r\n"
+  printf "%s%s -------------\r\n"
+  printf "%s%s  | $3: $4 |  \r\n"
+  printf "%s%s -------------\r\n"
+}
+
+### drawing
+lspciNnk(){
+  shopt -s nullglob
+    for g in `find /sys/kernel/iommu_groups/* -maxdepth 0 -type d | sort -V`; do
+      echo "IOMMU Group ${g##*/}:"
+      for d in $g/devices/*; do
+        echo -e "\t$(lspci -nns ${d##*/})"
+      done;
+    done;
+  gpu[$@]=`lspci -nnk | grep $1`
+#return "$gpu[$@]"
+}
+
+### logic
+    decor "host_name:" `hostname -f` \
+    "DMAR & IOMMU support:" `dmesg | grep -i -e DMAR -e IOMMU`\
+
+    lspciNnk NVIDIA
+### report
+    decor "GPU" "$gpu[$@]"
+

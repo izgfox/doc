@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+log_dir=/var/log
+echo "log_dir: $log_dir log_files: | secure | | syslog | | messages |"
+
+cd $log_dir && tail -n 5 -f secure -f syslog -f messages
