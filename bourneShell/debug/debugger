@@ -3,5 +3,14 @@
 log_dir=/var/log
 echo "log_dir: $log_dir log_files: | secure | | syslog | | messages |"
 
-cd $log_dir && tail -n $1 -f secure -f syslog -f messages
+cd $log_dir && tail -n $1 -f secure -f syslog -f messages | sed --unbuffered \
+    -e 's/\(.*kernel.*\)/\o033[34m\1\o033[39m/' \
+    -e 's/\(.*system.*\)/\o033[35m\1\o033[39m/' \
+    -e 's/\(.*su.*\)/\o033[36m\1\o033[39m/' \
+    -e 's/\(.*login.*\)/\o033[36m\1\o033[39m/' \
+    -e 's/\(.*polkit.*\)/\o033[36m\1\o033[39m/' \
+    -e 's/\(.*error.*\)/\o033[31m\1\o033[39m/' \
+    -e 's/\(.*warn.*\)/\o033[34m\1\o033[39m/' \
+    -e 's/\(.*dhc.*\)/\o033[37m\1\o033[39m/' \
+
 echo "lease set number of strings tailed"

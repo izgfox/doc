@@ -1,0 +1,6 @@
+kf5-env
+wl-env
+export $(dbus-launch)
+weston-launch
+kwrite -platform wayland
+#export KSCREEN_BACKEND=fake
