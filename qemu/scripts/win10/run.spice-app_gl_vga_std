@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+
+vm_pid=$$
+echo "vm_pid: $vm_pid"
+tpm_pid=`cat tpm_socket.pid`
+killall swtpm
+kill -9 $tpm_pid
+#nbd_pid=`cat nbd_socket.pid`
+#killall qemu-nbd
+#kill -9 $nbd_pid
+#sleep 1
+
+uuid=`uuidgen`
+vm_id="01"
+guest_os="windows_"
+guest_ver="10_"
+vm_name=$guest_os$guest_ver$vm_id
+mac_address="10:16:3e:ff:fe"
+disk0="w10_C_70G.qcow2"
+disk1="w10_J_69G.qcow2"
+cdrom="win10.iso"
+
+nohup swtpm socket --tpmstate dir=/tmp/mytpm1 --ctrl type=unixio,path=/tmp/mytpm1/swtpm-sock --log level=20 --tpm2 > swtpm.socket.log &
+echo $! > tpm_socket.pid
+
+#sleep 1
+
+qemu-system-x86_64 -D vm_name.$vm_name.error.log \
+-enable-kvm \
+  -machine type=q35,accel=kvm,kernel-irqchip=on,igd-passthru=on \
+  -uuid $uuid \
+  -name $vm_name \
+  -smp sockets=1,cores=6,threads=1,maxcpus=6 \
+   -cpu host,kvm=off,check,hv_vendor_id=1234567890ab \
+   -cdrom $cdrom \
+   -boot "menu=on,order=d" \
+   -m 16G \
+-bios /storage/install/newest/qemu/build/pc-bios/bios-256k.bin \
+-display spice-app,gl=on \
+-vga std \
+-device ioh3420,bus=pcie.0,addr=1c.0,multifunction=on,port=1,chassis=1,id=root.1 \
+-device vfio-pci,host=01:00.0,bus=root.1,addr=00.0,multifunction=on,x-vga=on,romfile=/storage/install/newest/rom/Asus.RTX3050Mobile.4096.210423.rom \
+-device vfio-pci,host=01:00.1,bus=root.1,addr=00.1 \
+-device intel-hda \
+-audiodev spice,id=id_audio_spice \
+-boot "menu=on,order=d" \
+  -drive "file=$disk0,index=0,media=disk" \
+  -drive "file=$disk1,index=1,media=disk,cache=writeback" \
+-spice gl=on \
+-device ivshmem-plain,memdev=ivshmem,bus=pcie.0 \
+-object memory-backend-file,id=ivshmem,share=on,mem-path=/dev/shm/looking-glass,size=32M \
+-device virtio-serial \
+-chardev spicevmc,id=vdagent,name=vdagent \
+-device virtserialport,chardev=vdagent,name=com.redhat.spice.0 \
+-rtc clock=host,base=localtime \
+ -net "nic,model=virtio,macaddr=${mac_address}:${vm_id}" \
+ -net "tap,ifname=tap1,script=no,downscript=no" \
+ -usb -usbdevice tablet \
+-monitor stdio -qmp unix:/tmp/qmp-socket,server=on,wait=off \
+
+    $@
+
+echo "------ start vm $ -"
+echo "code: $?"
+
+#virsh nodedev-reattach pci_0000_01_00_0
+#virsh nodedev-reattach pci_0000_01_00_1
+
+exit 0
