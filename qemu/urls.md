@@ -10,3 +10,6 @@ https://doc.opensuse.org/documentation/leap/virtualization/html/book-virtualizat
 ```
 https://wiki.archlinux.org/title/QEMU
 ```
+```
+https://wiki.gentoo.org/wiki/Nvidia_GPU_passthrough_with_QEMU_on_Lenovo_ThinkPad_P53
+```
