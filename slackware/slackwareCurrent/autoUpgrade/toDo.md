@@ -39,8 +39,14 @@ xorriso -as mkisofs \
 ```
 ### Write image to disk
 ```
-dd if=/tmp/slackware64-current.iso of=/dev/sda bs=512 status=progress
+dd if=/tmp/slackware64-current.iso of=/dev/sda bs=1M status=progress
 ```
+### backup
 ```
-mkinitrd -c -k 5.14.6 -m ext4 -f ext4 -s ./boot/initrd-tree/ -r /dev/nvme1n1p2 -o /boot/1n1.initrd.gz
+cd /boot
+cp ./initrd-tree/ ./initrd-tree.bak
+```
+### think about output initrd file and :
+```
+mkinitrd -k 5.15.12 -u -f ext4 -s ./initrd-tree/ -r /dev/nvme0n1p2 -o ./initrd.gz
 ```
