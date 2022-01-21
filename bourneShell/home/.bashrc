@@ -62,7 +62,7 @@ export LD_LIBRARY_PATH=/storage/kvm/usr/local/lib/
 alias ll='ls -latr --color'
 alias qwe='cd /storage/kvm/win10/stable/ && ./run'
 alias qw='cd /storage/kvm/win10/stable/'
-alias qmp='cd /storage/install/newest/qemu/scripts/qmp && /tmp/qmp-socket'
+alias qmp='cd /storage/install/newest/qemu/scripts/  && ./qmp-shell /tmp/qmp.io'
 alias n='nano ~/.bashrc'
 #```
 #----------------------------------------------------------------------------
