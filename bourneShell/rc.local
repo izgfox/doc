@@ -49,22 +49,22 @@ $p "
 echo                  "nameserver 8.8.8.8" > /etc/resolv.conf
 echo                                   "1" > /proc/sys/net/ipv4/ip_forward
 
-    if=/sbin/ifconfig
-    ov=/usr/sbin/openvpn
-    ov_md="$ov --mktun --dev"
-    br=/usr/sbin/brctl
-    interface_ethernet_name=eth0
-      et_name=$interface_ethernet_name
-    interface_bridge_name=br0
-      br_name=$interface_bridge_name
-    interface_ethernet_address="0.0.0.0"
-      et_addr=$interface_ethernet_address
-    interface_bridge_address="10.10.20.1"
-      br_addr=$interface_bridge_address
-    interface_bridge_netmask="255.255.255.0"
-      br_mask=$interface_bridge_netmask
+  if=/sbin/ifconfig
+  ov=/usr/sbin/openvpn
+  ov_md="$ov --mktun --dev"
+  br=/usr/sbin/brctl
+  interface_ethernet_name=eth0
+    et_name=$interface_ethernet_name
+  interface_bridge_name=br0
+    br_name=$interface_bridge_name
+  interface_ethernet_address="0.0.0.0"
+    et_addr=$interface_ethernet_address
+  interface_bridge_address="10.10.20.1"
+    br_addr=$interface_bridge_address
+  interface_bridge_netmask="255.255.255.0"
+    br_mask=$interface_bridge_netmask
 #```
-#*--- ethernet.interface ::
+#*--- ethernet.interface.setup ::
 #```
 $if $interface_ethernet_name    down
 $if $interface_ethernet_name       \
@@ -77,7 +77,9 @@ $br setfd $interface_bridge_name   0
 $if       $interface_bridge_name   \
 $interface_bridge_address netmask  \
 $interface_bridge_netmask promisc up
-
+#```
+#*--- tap.interface.setup ::
+#```
 $ov_md tap0 --user  izgfox
 $ov_md tap1 --user  izgfox
 $ov_md tap2 --user `id -un`
@@ -123,7 +125,7 @@ $p "
 "
 #```
 rm -rf /storage/backup/home/izgfox/.cache/mozilla
-time rsync -avz /storage/backup/home/izgfox /home/ > /tmp/izgfox.rsync.log
+#time rsync -avz /storage/backup/home/izgfox /home/ > /tmp/izgfox.rsync.log
 #```
 $p "
 #------------------------------------------------------- .rsync.home.conplete
@@ -146,27 +148,18 @@ neofetch
 $p "
 -----------------------------------------------------------------------------
 ------------------------------------------------------ .qt.kde.plasma.wayland
-                             w.land                                    
+                             w.land                                          
 -----------------------------------------------------------------------------
 "
-#$p "
-#================================================================ .dbus.launch
-#export \
-#$(dbus-launch) \
-#&& export \
-#XDG_RUNTIME_DIR=/mnt/cacheRamfs/ && \
-#dbus-run-session startplasma-wayland
-#============================================================================="
-#mkdir -p /dev/shm/kde && chown -R izgfox /dev/shm/kde
-#export XDG_RUNTIME_DIR=/dev/shm/kde
-#su -c "export $(dbus-launch) && export XDG_RUNTIME_DIR=/home/izgfox/xdg \
-#&& kwin_wayland --xwayland && dbus-run-session startplasma-wayland --drm" izgfox
-#kwin_wayland --xwayland
-#QT_QPA_PLATFORM=wayland kwrite
-#sudo su -c 'XDG_RUNTIME_DIR=/dev/shm/kdecd && cd /home/izgfox' izgfox -l
-#echo "
-#export $(dbus-launch).
-#dbus-run-session startplasma-wayland --drm
+$p "
+================================================================ .dbus.launch
+export \
+$(dbus-launch) \
+&& export \
+XDG_RUNTIME_DIR=/mnt/cacheRamfs/ && \
+startplasma-wayland falkon
+============================================================================="
+### --------------------------------------------------------- .vfio.qemu.pcie
 #modprobe vfio
 #modprobe vfio_iommu_type1
 #modprobe vfio_pci
@@ -179,6 +172,6 @@ $p "
 #echo "0000:01:00.1" > /sys/bus/pci/drivers/vfio-pci/bind
 ###
 #/etc/rc.d/rc.bumblebeed start
-
-
+###
+#====================================================== .initialisation.start
 
