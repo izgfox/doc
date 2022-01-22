@@ -1,0 +1,190 @@
+#!/usr/bin/env bash
+
+#-------------------------------------------------
+ p="echo"                        # \ \ ASCII // #|
+#---------                       # / / POSIX \\ #|
+#                                -----------------
+$p "
+============================ .initialisation.start
+-------------------------------------------- .rc.d
+"
+cat <<'EOF'
+           _..._
+         .'     '.
+        /  _   _  \
+        | (o)_(o) |
+         \(     ) /
+         //'._.'\ \
+        //   .   \ \
+       ||   .     \ \
+       |\   :     / |
+       \ `) '   (`  /_
+     _)``".____,.'"` (_
+     )     )'--'(     (
+      '---`      `---`   :: rc.local
+EOF
+$p "
+----------------------------------------------------
+------------------------------------- .kernel.tuning
+"
+#```
+echo "9223372036854775807" > /proc/sys/kernel/shmmax
+#```
+$p "
+----------------------------------------------------
+--------------------------------------- .ramfs.setup
+"
+#```
+user_name=izgfox
+cacheRamfs='/mnt/cacheRamfs'
+mkdir -p $cacheRamfs
+mount -t ramfs -o size=3G cacheRamfs $cacheRamfs
+chown -R izgfox:kvm /mnt/cacheRamfs
+chmod -R 700 /mnt/cacheRamfs/
+ln -s /home/$user_name/.cache /mnt/cacheRamfs/
+#```
+$p "
+----------------------------------------------------
+------------------------------------- .network.setup
+"
+#```
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+echo     "1" > /proc/sys/net/ipv4/ip_forward
+
+ if=/sbin/ifconfig
+ ov=/usr/sbin/openvpn
+  ov_md="$ov --mktun --dev"
+ br=/usr/sbin/brctl
+  interface_ethernet_name=eth0
+    et_name=$interface_ethernet_name
+  interface_bridge_name=br0
+    br_name=$interface_bridge_name
+  interface_ethernet_address="0.0.0.0"
+    et_addr=$interface_ethernet_address
+  interface_bridge_address="10.10.20.1"
+    br_addr=$interface_bridge_address
+  interface_bridge_netmask="255.255.255.0"
+    br_mask=$interface_bridge_netmask
+
+#```
+$p "
+------------------------ ethernet.interface.setup ::
+"
+#```
+$if $interface_ethernet_name    down
+$if $interface_ethernet_name       \
+    $interface_ethernet_address   up
+#```
+$p "
+-------------------------- bridge.interface.setup ::
+"
+#```
+$br addbr $interface_bridge_name
+$br setfd $interface_bridge_name   0
+$if       $interface_bridge_name   \
+$interface_bridge_address netmask  \
+$interface_bridge_netmask promisc up
+#```
+$p "
+----------------------------- tap.interface.setup ::
+"
+#```
+$ov_md tap0 --user  izgfox
+$ov_md tap1 --user  izgfox
+$ov_md tap2 --user `id -un`
+$ov_md tap3 --user `id -un`
+#*                    ...
+$ov_md tap9 --user  izgfox
+
+$br addif br0 eth0
+$br addif br0 tap0
+$br addif br0 tap1
+#*            ...
+$br addif br0 tap9
+
+$if  br0 up
+$if tap0 up
+$if tap1 up
+$if tap2 up
+$if tap3 up
+$if tap9 up
+
+$p "
+---------------------------------- firewall.setup ::
+"
+iptables --flush
+iptables -t         nat -F
+iptables -X
+iptables -Z
+iptables -P         INPUT ACCEPT
+iptables -P         OUTPUT ACCEPT
+iptables -P         FORWARD     ACCEPT
+iptables -t nat  -A POSTROUTING      \
+-s 10.10.20.0/24 -j MASQUERADE
+
+$if br0:1 10.10.20.20 up
+#```
+$p "
+----------------------------------------------------
+---------------------------------- .early.wifi.setup
+"
+#```
+$if wlan0 0.0.0.0 down
+#```
+$p "
+----------------------------------------------------
+---------------------------- .locate.database.update
+"
+#```
+updatedb &
+#```
+$p "
+----------------------------------------------------
+--------------------------------- .wiFi.screen.start
+"
+#```
+su - root -c "\
+ /usr/bin/screen -dmS wiFi bash -lc \
+ 'wpa_supplicant -Dnl80211 -i wlan0 -c \
+  /etc/wpa_supplicant.conf; exec bash'
+"
+dhclient wlan0 &
+#```
+$p "
+----------------------------------------------------
+------------------------------------------ .neofetch
+"
+#```
+neofetch
+#```
+$p "
+----------------------------------------------------
+---------------------------------- .rsync.home.start
+. . . progress
+"
+#```
+    sync_from=/storage/backup/home/izgfox
+    sync_to=/home/
+    sync_log=/tmp/izgfox.rsync.log
+    shit="/storage/backup/home/izgfox/.cache/mozilla"
+  rm -rf $shit
+  time rsync -avz $sync_from $sync_to > $sync_log
+
+#```
+$p "
+--------------------------------- .rsync.home.conplete
+------------------------------------------------------
+------------------------------- .qt.kde.plasma.wayland
+    startkwayland
+========================================= .dbus.launch
+ export $(dbus-launch) &&\
+ export XDG_RUNTIME_DIR=/mnt/cacheRamfs/ &&\
+ startplasma-wayland falkon
+"
+#```
+
+#```
+$p "
+------------------------------------------------------
+================================== .initialisation.end
+"
