@@ -3,8 +3,21 @@
 #----------------------------------------------------------------------------
 cd
 #```
-p=/usr/bin/echo
-ans=~/ascii/STY-HLK.ANS
+p=echo
+#ans=~/ascii/STY-HLK.ANS
+i=`ls  | grep -e ans -e ANS | grep -v png | shuf -n 1`
+ans=$i
+# POSIX
+meta_size=$(wc -c < "$ans")
+##```
+#----------------------------------------------------------------------------
+#------------------------------------------------------------- ascii.wellcome
+$p "art: $i"
+$p "
+--------------------
+  $meta_size  
+--------------------
+"
 size=71
 enc="iconv -f CP437 -t UTF-8"
 box="boxes -d java-cmt -p a2v1"
@@ -75,7 +88,7 @@ alias n='nano ~/.bashrc'
 alias profile.reload='source ~/.bashrc'
 #```
 #*    ->
-##*------------- profile.reload
+##*------------- profile.reload ::
 #```
   alias p.reload=profile.reload
 #```
@@ -116,21 +129,27 @@ alias wifi.set.home.restart.check='~.helper/.wifi/.home/wifi.set.restart.check'
 #```
 alias   wi.setup=wifi.set.home.restart.check
 #```
-
+#------------------------------------------------------------------------------
+##---------------------------------------------------------- :ascii::art::setup
+#```
+#ans=~/ascii/STY-HLK.ANS
+ans=$i
+size=71
+enc="iconv -f CP437 -t UTF-8"
+box="boxes -d java-cmt -p a2v1"
+reader=bsdcat
+##```
+#```
+#ll ~/ | grep -e ans -e ANS
+#```
+#ans=~/ascii/STY-HLK.ANS
+ans=$i
+# POSIX
+meta_size=$(wc -c < "$ans")
+# 'meta::size:'
 $p "
-------------------------------------------------------------------------------
------------------------------------------------------------------ .dbus.launch
-"
-#*--- env.qt.wayland.setup
-export \
-$(dbus-launch) \
-&& export \
-XDG_RUNTIME_DIR=/mnt/cacheRamfs/ \
-#
-$p "
-$(dbus-launch)
-------------------------------------------------------------------------------
--------------------------------------------------------- .wayland.falkon.start
-startplasma-wayland falkon
-============================================================== .user.setup.end
+#------------------------------------------------------------------------------
+#-------------------------------------------------------- :file::metadata::size
+  $meta_size
+#============================================================== .user.setup.end
 "
