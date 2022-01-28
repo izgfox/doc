@@ -12,12 +12,13 @@ ARCH=x86_64 \
 ./mirror-slackware-current.sh \
 -l . \
 -X none \
--m slackware.tsu.ru::slackware/slackware64-current \
+-m mirror.yandex.ru::slackware/slackware64-current \
 -o NONE
 ```
 ### Make install iso image from current
 **Chech disk space on /tmp before**
 ```
+mkdir -p /tmp/slackwareCurrent
 cd slackware64-current
 xorriso -as mkisofs \
   -iso-level 3 \
@@ -39,7 +40,7 @@ xorriso -as mkisofs \
 ```
 ### Write image to disk
 ```
-dd if=/tmp/slackware64-current.iso of=/dev/sda bs=1M status=progress
+dd if=/tmp/slackwareCurrent/slackware64-current.iso of=/dev/nvme1n1p5 bs=1M status=progress
 ```
 ### backup
 ```

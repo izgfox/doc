@@ -1,0 +1,26 @@
+dev=nvme0n1p2
+rootfs=/mnt/$dev
+mkdir -p $rootfs
+mount /dev/$dev $rootfs
+cd $rootfs
+echo "rootfs contains:"
+ls -lart ./
+#
+mv $rootfs/tmp $rootfs/tmp.bak
+ln -s /storage/kvm/tmp $rootfs/
+#
+mv $rootfs/home $rootfs/home.bak
+#
+mkdir -p $rootfs/storage/kvm $rootfs/storage2 $rootfs/home
+#
+mv $rootfs/usr/local $rootfs/usr/local.bak
+ln -s /storage/kvm/usr/local $rootfs/usr/
+#
+mv $rootfs/usr/share $rootfs/usr/share.bak
+ln -s /storage/kvm/share $rootfs/usr/
+#
+cp /etc/rc.d/rc.local $rootfs/etc/rc.d/
+cp /storage/backup/etc/fstab $rootfs/etc/
+cp /etc/wpa_supplicant.conf* $rootfs/etc/
+cp /root/.bash* $rootfs/root/
+
